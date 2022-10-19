@@ -1,0 +1,65 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+###
+GET {{api_url}}/users
+Authorization: Bearer {{jwt}}
+###
+GET {{api_url}}/users/me
+Authorization: Bearer {{jwt}}
+###
+GET {{api_url}}/users/6118e9fcb952b9001ce3a9ea
+Authorization: Bearer {{jwt}}
+###
+POST {{api_url}}/users
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "fullName": "First",
+    "email": "man1@gmail.com",
+    "password": "123456",
+    "phone": "0123456789",
+    "role": "manager"
+}
+###
+PUT {{api_url}}/users/60e7123eac20970092fb2308
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "fullName": "Manager name2 Nguyen",
+    "phone": "0123456789",
+    "email": "ok"
+}
+###
+DELETE {{api_url}}/users/60fccec7aea2e502ad8001e6
+Authorization: Bearer {{jwt}}
+###
+POST {{api_url}}/users/6118e9fcb952b9001ce3a9ea/avatar
+Authorization: Bearer {{jwt}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="oem logo.png"
+Content-Type: image/png
+
+< /Users/halong/Downloads/oemlogo.png
+--WebAppBoundary--
+###
+GET {{api_url}}/users/avatars/6118e9fcb952b9001ce3a9ea/OmVGqmQ38LJ_ssVi.png
+###
+POST {{api_url}}/users/60e7123eac20970092fb2308/roles
+Authorization: Bearer {{jwt}}
+###
+PUT {{api_url}}/users/60fe41f7efe88e04e5774930/attribute
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "attribute": "60fb9845c049c000a8fa1f72",
+    "value": "sale"
+}
+###
+DELETE {{api_url}}/users/60fe41f7efe88e04e5774930/attribute/60fb9845c049c000a8fa1f72
+Authorization: Bearer {{jwt}}

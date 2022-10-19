@@ -1,0 +1,73 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+GET {{api_url}}/todos?status=new
+Authorization: Bearer {{jwt}}
+###
+GET {{api_url}}/todos/6104dace79adc2004f2e0ef3
+Authorization: Bearer {{jwt}}
+###
+POST {{api_url}}/todos
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "name": "todo 1",
+    "description": "lam nhanh todo",
+    "relateProducts": [
+        "ab"
+    ]
+}
+###
+PUT {{api_url}}/todos/6104dace79adc2004f2e0ef3
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "dueDate": "2021-08-07T05:11:01.422Z"
+}
+###
+PUT {{api_url}}/todos/6104dace79adc2004f2e0ef3/products
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+[
+    "60f23bd3f7e30a007858ca69",
+    "60f23bd3f7e30a007858ca69"
+]
+###
+DELETE {{api_url}}/todos/6104dace79adc2004f2e0ef3/products
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+[
+    "6104dace79adc2004f2e0ef3"
+]
+###
+PUT {{api_url}}/todos/6104dace79adc2004f2e0ef3/customers
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+[
+    "6104dace79adc2004f2e0ef3"
+]
+###
+DELETE {{api_url}}/todos/6104dace79adc2004f2e0ef3/products
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+[
+    "6104dace79adc2004f2e0ef3"
+]
+###
+POST {{api_url}}/todos/6104dace79adc2004f2e0ef3/attachments
+Authorization: Bearer {{jwt}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="oem logo.png"
+Content-Type: image/png
+
+< /Users/halong/Downloads/oemlogo.png
+--WebAppBoundary--
+###

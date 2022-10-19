@@ -1,0 +1,63 @@
+version: '3.3'
+
+volumes: 
+  mongodata:
+  node_modules_service:
+
+services: 
+  mongodb:
+    image: mongo:4.2.6
+    restart: unless-stopped
+    environment: 
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    volumes: 
+      - mongodata:/data/db
+      - ./backup:/backup
+    ports: 
+      - 27017:27017
+
+  redis:
+    image: redis:6.0.6-alpine
+    volumes:
+      - ./redis.db:/data
+    ports:
+      - 6379:6379
+
+  service:
+    build:
+      context: .
+      target: dev
+    image: xbesty-app-service
+    volumes:
+      - node_modules_service:/app/node_modules
+      - ./:/app
+      - ./hiboss-b399a-firebase-adminsdk-rtdf1-7cac96f31d.json:/app/firebase-key.json
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017/test
+      - MONGODB_USERNAME=root
+      - MONGODB_PASSWORD=root
+    env_file: 
+      - ./app.env
+      - ./aws.env
+    ports:
+      - 3000:3000
+      # debug
+      - 9229:9229
+    entrypoint: ["npm", "run", "start:debug"]
+    depends_on:
+      - mongodb
+      - redis
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=root
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+    links:
+      - mongodb

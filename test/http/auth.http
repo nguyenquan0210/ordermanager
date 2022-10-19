@@ -1,0 +1,47 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+###
+POST {{api_url}}/auth/login
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "123456"
+}
+
+###
+POST {{api_url}}/auth/refresh_token
+Content-type: application/json
+
+{
+    "accessToken": "",
+    "refreshToken": ""
+}
+###
+POST {{api_url}}/auth/register
+Content-type: application/json
+
+{
+    "fullName": "A Long",
+    "email": "longvn02@gmail.com",
+    "password": "123456"
+}
+###
+GET {{api_url}}/auth/confirm_email?id=&token=
+###
+POST {{api_url}}/auth/forgot_password
+Content-Type: application/json
+
+{
+    "email": "longvn00@gmail.com"
+}
+###
+POST {{api_url}}/auth/reset_password
+Content-Type: application/json
+
+{
+    "email": "longvn00@gmail.com",
+    "password": "abcdef",
+    "code": "61672"
+}

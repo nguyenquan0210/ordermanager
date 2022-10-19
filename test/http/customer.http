@@ -1,0 +1,21 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+GET {{api_url}}/customers
+Authorization: Bearer {{jwt}}
+###
+POST {{api_url}}/customers
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "fullName": "Khach Hang",
+    "email": "xy@gmail.com",
+    "attributes": [
+        {
+            "attribute": "61012d35ace73c05dc9c3693",
+            "value": 22
+        }
+    ]
+
+}

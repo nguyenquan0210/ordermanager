@@ -1,0 +1,15 @@
+**/node_modules
+**/node_env
+**/*.env
+**/Dockerfile
+**/logs
+**/public
+**/dist
+.git
+.vscode
+**/test
+**/docs
+**/redis.db
+**/backup
+**/.DS_Store
+**/ansible

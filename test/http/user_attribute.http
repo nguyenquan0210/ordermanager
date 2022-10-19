@@ -1,0 +1,27 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+GET {{api_url}}/attributes/user
+Authorization: Bearer {{jwt}}
+###
+POST {{api_url}}/attributes/user
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "name": "Dien thoai",
+    "valueType": "array.string"
+}
+###
+PUT {{api_url}}/attributes/user/60fb9c3b3fb04600cfbcfc32
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "name": "Lương",
+    "valueType": "number",
+    "isRequired": true
+}
+###
+DELETE {{api_url}}/attributes/user/60fb925881efcf00440a7582
+Authorization: Bearer {{jwt}}

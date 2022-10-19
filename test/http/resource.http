@@ -1,0 +1,46 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+GET {{api_url}}/resources/categories
+Authorization: Bearer {{jwt}}
+
+###
+POST {{api_url}}/resources/categories
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "name": "danh muc1",
+    "desc": "abc"
+}
+###
+GET {{api_url}}/resources?type=image&ctg=6&category=6131967afd47e60158d863df
+Authorization: Bearer {{jwt}}
+###
+POST {{api_url}}/resources
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "name": "Nha cap 2",
+    "category": "6131967afd47e60158d863df",
+    "type": "video"
+}
+###
+POST {{api_url}}/resources/6131a0642d2ca7020fc332b5/upload
+Authorization: Bearer {{jwt}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="oemlogo.png"
+Content-Type: image/png
+
+< /Users/halong/Downloads/oemlogo.png
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+Content-Type: text/plain
+
+cover image
+--WebAppBoundary--
+###
+GET {{api_url}}/resources/default/image/6131a0642d2ca7020fc332b5/utiDYMZTOaZuQD1oLFzjDIUA.png

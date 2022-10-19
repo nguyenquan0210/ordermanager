@@ -1,0 +1,16 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+GET {{api_url}}/products/labels
+Authorization: Bearer {{jwt}}
+
+###
+POST {{api_url}}/products/labels
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "name": "New",
+    "color": "blue",
+    "description": "hang moi ve"
+}

@@ -1,0 +1,9 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+###
+GET {{api_url}}/products/histories/611dad90233b5c01711d1f4e
+Authorization: Bearer {{jwt}}
+###
+GET {{api_url}}/products/histories/detail/6131e6aa259f2b04207d4801
+Authorization: Bearer {{jwt}}

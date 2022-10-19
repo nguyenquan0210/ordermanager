@@ -1,0 +1,2 @@
+[development]
+dev ansible_user=ubuntu ansible_port=7878 ansible_host=103.90.234.225

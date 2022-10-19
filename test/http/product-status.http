@@ -1,0 +1,18 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+GET {{api_url}}/product-status
+Authorization: Bearer {{jwt}}
+###
+GET {{api_url}}/product-status/611927f2e4c5e801e4924ef4
+Authorization: Bearer {{jwt}}
+###
+POST {{api_url}}/product-status
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "name": "Dang ban",
+    "color": "Red",
+    "description": "test thoi"
+}

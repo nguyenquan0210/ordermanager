@@ -1,0 +1,18 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+GET {{api_url}}/product-ctgs
+Authorization: Bearer {{jwt}}
+###
+GET {{api_url}}/product-ctgs/611927e2e4c5e801e4924eef
+Authorization: Bearer {{jwt}}
+###
+POST {{api_url}}/product-ctgs
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "name": "Dang ban",
+    "color": "Red",
+    "description": "test thoi"
+}

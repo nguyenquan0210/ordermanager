@@ -1,0 +1,19 @@
+---
+- hosts: all
+  gather_facts: no
+
+  tasks:
+    - name: run update scripts
+      command: bash update-service-techapp
+      args:
+        chdir: ~/devops
+        removes: update-service-techapp
+      register: deploy
+
+    - debug: var=deploy.stdout_lines
+
+    - name: show docker info 
+      command: docker ps -a
+      register: node
+    
+    - debug: var=node.stdout_lines

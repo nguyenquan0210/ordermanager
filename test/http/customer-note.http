@@ -1,0 +1,17 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+GET {{api_url}}/customers/notes?customer=61ab0155837f7a002738cd06
+Authorization: Bearer {{jwt}}
+###
+GET {{api_url}}/customers/notes/623b3970b6e1930011b16153
+Authorization: Bearer {{jwt}}
+###
+POST {{api_url}}/customers/notes
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "note": "red",
+    "customer": "61ab0155837f7a002738cd06"
+}

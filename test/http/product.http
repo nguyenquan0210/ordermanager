@@ -1,0 +1,81 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+###
+GET {{api_url}}/products
+Authorization: Bearer {{jwt}}
+
+###
+POST {{api_url}}/products
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "name": "Sp 3",
+    "description": "sp info",
+    "attributes": [
+        {
+            "attribute":"61002905be750101c059fc7e",
+            "value": 200
+        }
+    ]
+}
+###
+PUT {{api_url}}/products/60f047ffd5b4310033ee9ec3
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "description": "sp info update3"
+}
+###
+POST {{api_url}}/products/60f23bd3f7e30a007858ca69/images
+Authorization: Bearer {{jwt}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="oemlogo.png"
+Content-Type: image/png
+
+< /Users/halong/Downloads/oemlogo.png
+--WebAppBoundary
+Content-Disposition: form-data; name="name"
+Content-Type: text/plain
+
+cover image
+--WebAppBoundary--
+###
+POST {{api_url}}/products/60f23bd3f7e30a007858ca69/files
+Authorization: Bearer {{jwt}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="oemlogo.png"
+Content-Type: image/png
+
+< /Users/halong/Downloads/oemlogo.png
+--WebAppBoundary--
+###
+DELETE {{api_url}}/products/60f23bd3f7e30a007858ca69
+Authorization: Bearer {{jwt}}
+###
+DELETE {{api_url}}/products/60f23bd3f7e30a007858ca69/files/60f23cecb39a640085e82486
+Authorization: Bearer {{jwt}}
+
+###
+DELETE {{api_url}}/products/61002a8b20da9201dacef9dd/attribute/61002905be750101c059fc7e
+Authorization: Bearer {{jwt}}
+###
+GET {{api_url}}/products/default/611daa278fd2180123f3e126/images/WSomUnpXeUh71J2G4MX-MlyF.png
+
+
+###
+POST {{api_url}}/products/relateCustomers
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "product": "611daa278fd2180123f3e126",
+    "customer": "6146e23525c5ed010b079aae",
+    "note": "muon ban"
+}

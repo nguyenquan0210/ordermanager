@@ -1,0 +1,15 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+GET {{api_url}}/customers/labels
+Authorization: Bearer {{jwt}}
+###
+POST {{api_url}}/customers/labels
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "name": "VIP",
+    "color": "red",
+    "description": "Khach vip"
+}

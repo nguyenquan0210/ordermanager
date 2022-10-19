@@ -1,0 +1,28 @@
+@api_url={{baseurl}}:{{port}}
+@jwt=
+
+GET {{api_url}}/attributes/product
+Authorization: Bearer {{jwt}}
+###
+POST {{api_url}}/attributes/product
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "name": "Dien tich",
+    "valueType": "number",
+    "isRequired": false
+}
+###
+PUT {{api_url}}/attributes/product/60fb9c3b3fb04600cfbcfc32
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+
+{
+    "name": "Color",
+    "valueType": "string",
+    "isRequired": true
+}
+###
+DELETE {{api_url}}/attributes/product/60fb925881efcf00440a7582
+Authorization: Bearer {{jwt}}
