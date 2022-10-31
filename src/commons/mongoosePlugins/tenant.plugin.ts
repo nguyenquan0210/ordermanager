@@ -3,18 +3,18 @@ import { PopulateOptions, Schema } from "mongoose";
 declare module 'mongoose' {
     interface Query<ResultType, DocType extends Document, THelpers = {}> {
         /**
+         * `Tenant Plugin`: Find a document by tenant ID. Skip if it's empty and not use strict
+         * @param tenantID Tenant ID which use to query. It can be chain with other queries.
+         * @param isStrict if true, if tenantID is empty will make query document that not exist tenant
+         */
+        byTenant(tenantID?: string, checkrole?: boolean): this;
+        /**
          * `Tenant Plugin`
          * Specifies tenant should be populated with other documents in the case tenantID is ObjectID
          * @param select Field selection for the population query
          * @param model The model you wish to use for population. If not specified, populate
          * will take the default model name (`Organization`).
          * @param options Populate option to make nest population
-         */
-        byTenant(tenantID?: string): this;
-        /**
-         * `Tenant Plugin`: Find a document by tenant ID. Skip if it's empty and not use strict
-         * @param tenantID Tenant ID which use to query. It can be chain with other queries.
-         * @param isStrict if true, if tenantID is empty will make query document that not exist tenant
          */
         populateTenant(select?: string, model?: string, options?: PopulateOptions): this;
 
@@ -84,15 +84,20 @@ export class TenantPlugin {
             }
         }
 
-        schema.query.byTenant = function (tenantID?: string, isStrict?: boolean) {
-            if (!tenantID) {
+        schema.query.byTenant = function (tenantID?: string, isRole?: boolean, isStrict?: boolean) {
+            if (!tenantID && !isRole) {
                 if (isStrict && !this.getQuery()[TenantPlugin.k_tenant_field]) {
                     return this.exists(TenantPlugin.k_tenant_field, false);
                 } else {
                     return this;
                 }
             }
-            return this.where(TenantPlugin.k_tenant_field).equals(tenantID);
+            if(isRole){
+                return this;
+            }else{
+                return this.where(TenantPlugin.k_tenant_field).equals(tenantID);
+            }
+            
         }
     }
 }

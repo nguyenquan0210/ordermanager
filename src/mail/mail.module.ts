@@ -10,7 +10,7 @@ import { SMTP_CONFIG } from 'src/commons/constants/envConstanst';
     MailerModule.forRoot({
       transport: {
         host: SMTP_CONFIG.HOST,
-        secure: SMTP_CONFIG.SECURE,
+        secure: SMTP_CONFIG.SECURE == '1',//((Boolean)(SMTP_CONFIG.SECURE)) || false,
         auth: {
           user: SMTP_CONFIG.USER,
           pass: SMTP_CONFIG.PASS

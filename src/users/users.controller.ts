@@ -105,8 +105,9 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id, { throwIfFail: true, lean: true });
+  findOne(@Param('id') id: string,
+  @AuthUser() userReq: JwtUser) {
+    return this.usersService.findOneUser(id, { throwIfFail: true, lean: true }, userReq);
   }
 
   @Put(':id')

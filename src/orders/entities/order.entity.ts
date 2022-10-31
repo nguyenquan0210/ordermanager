@@ -4,7 +4,6 @@ import { Document } from "mongoose";
 import { ITenant } from 'src/commons/mongoosePlugins/tenant';
 import { Types } from 'mongoose';
 import { ORDER_LABEL, ORDER_STATUS, ORDER_COMMENT, ORDER_PRODUCT } from 'src/commons/constants/schemaConst';
-import { OrderStatus } from 'src/order-status/entities/order-status.entity';
 import { TenantPlugin } from 'src/commons/mongoosePlugins/tenant.plugin';
 import { Label } from 'src/labels/entities/label.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -14,6 +13,7 @@ import { OrderComment } from './order-comment.entity';
 import { OrderSurchargeDocument, OrderSurchargeSchema } from "./order-surcharge.entity";
 import { OrderDiscountDocument, OrderDiscountSchema } from "./order-discount.entity";
 import { Todo } from './../../todos/entities/todo.entity';
+import { OrderStatusEnum } from '../interface/order-discount';
 
 @Schema({ timestamps: true, toJSON: { versionKey: false } })
 export class Order implements ITenant {
@@ -31,11 +31,14 @@ export class Order implements ITenant {
     @Prop({ type: String, ref: User.name, autopopulate: { select: 'username' } })
     owner?: string;
 
-    @Prop({
-        type: mongoose.Schema.Types.ObjectId, ref: ORDER_STATUS,
-        autopopulate: { select: 'name color description' }
-    })
-    status?: any | OrderStatus;
+    // @Prop({
+    //     type: mongoose.Schema.Types.ObjectId, ref: ORDER_STATUS,
+    //     autopopulate: { select: 'name color description' }
+    // })
+    // status?: any | OrderStatus;
+
+    @Prop({type: OrderStatusEnum})
+    status?: OrderStatusEnum;
 
     @Prop({
         type: mongoose.Schema.Types.ObjectId, ref: Customer.name,

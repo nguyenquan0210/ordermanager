@@ -53,7 +53,7 @@ export class AuthService {
             throw new NotFoundException(ErrCode.E_USER_NOT_FOUND);
         }
 
-        if(user.role == UserRole.Owner){
+        if(user.role == UserRole.Customer){
             const verifyUser = await this.userService.verifyUserEmail(username);
             if (!verifyUser) {
                 throw new NotFoundException(ErrCode.E_USER_NOT_VERIFY);
@@ -161,7 +161,7 @@ export class AuthService {
         // tạo tài khoản owner
         const user = await this.userService.registerOwner({
             ...dto,
-            role: UserRole.Owner
+            role: UserRole.Customer
         });
 
         const token = Math.floor(10000 + Math.random() * 90000).toString();

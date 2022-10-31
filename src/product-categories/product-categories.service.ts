@@ -27,19 +27,18 @@ export class ProductCategoriesService {
   ) { }
   create(createProductCategoryDto: CreateProductCategoryDto, authUser: JwtUser) {
     CheckRoleStaff(authUser, StaffRole.Profile);
-
     return new this.productCtgModel(createProductCategoryDto)
       .withTenant(authUser.owner)
       .save();
   }
 
-  async findAll(authUser: JwtUser, query?: Paginate & { search?: string }) {
+  async findAll(authUser: JwtUser, query?: Paginate & { search?: string, isOwner: boolean }) {
     const filter: FilterQuery<ProductCategoryDocument> = {};
     if (query.search) {
       filter.$text = { $search: query.search };
     }
     const cmd = this.productCtgModel.find(filter)
-      .byTenant(authUser.owner)
+      .byTenant(authUser.owner, new String(query?.isOwner) == 'false') 
       .lean()
     if (query.limit) {
       cmd.limit(query.limit)
@@ -55,7 +54,7 @@ export class ProductCategoriesService {
 
   findOne(id: string, authUser: JwtUser) {
     return this.productCtgModel.findById(id)
-      .byTenant(authUser.owner)
+      //.byTenant(authUser.owner)
       .orFail(new NotFoundException(ErrCode.E_PRODUCT_CTG_NOT_FOUND))
       .populateTenant('username')
       .lean()

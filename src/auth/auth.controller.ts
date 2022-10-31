@@ -59,7 +59,8 @@ export class AuthController {
         @Query('token') token: string) {
         try {
             const result = await this.authService.confirmEmail(userId, token);
-            return response.redirect('https://play.google.com/store/apps/details?id=com.hifiveplus.hiboss');
+            //return response.redirect('https://play.google.com/store/apps/details?id=com.hifiveplus.hiboss');
+            response.contentType('html').send('Confirmation succuss');
         } catch (error) {
             return response.contentType('html').send(error.message);
         }
