@@ -5,6 +5,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
+import Excel from 'exceljs';
+import path from "path";
 import { ErrCode } from '../commons/constants/errorConstants';
 import { UserChangePassword } from './dto/userChangePass.dto';
 import { JwtUser } from 'src/auth/inteface/jwtUser';
@@ -20,7 +22,7 @@ import { nanoid } from 'nanoid';
 import { Paginate } from 'src/commons/dto/paginate.dto';
 import { VerifyStatus } from 'src/commons/define';
 import { filterParams } from 'src/commons/utils/filterParams';
-import { CheckRoleStaff } from 'src/utils/checkRoleStaff';
+import { CheckRoleStaff, CheckRoleStaffCreateUser } from 'src/utils/checkRoleStaff';
 import { CHECK_SIZE_FILE, LEVEL_ACCOUNT } from 'src/commons/constants/envConstanst';
 import { MailService } from 'src/mail/mail.service';
 import { MyLogService } from 'src/loggers/winston.logger';
@@ -31,6 +33,8 @@ import { ChangeLanguageDto } from './dto/change-language.dto';
 import { ResourcesService } from 'src/resources/resources.service';
 import { ResourceType } from 'src/resources/inteface/resourceType';
 import { ChangeCommissionDto } from './dto/change-commission.dto';
+//import { PackkagesService } from 'src/packkages/packkage.service';
+
 
 @Injectable()
 export class UsersService {
@@ -41,14 +45,15 @@ export class UsersService {
     private mailService?: MailService,
     private logger?: MyLogService,
     private readonly resourcesService?: ResourcesService,
-  ) { }
+    //private readonly packkagesService?: PackkagesService,
+    ) { }
 
   async create(createUserDto: CreateUserDto, userReq: JwtUser) {
 
-    const totalStaff = await this.checkTotalStaff(userReq);
-    if (totalStaff) {
-      throw new BadRequestException(ErrCode.E_USER_MAX);
-    }
+    // const totalStaff = await this.checkTotalStaff(userReq);
+    // if (totalStaff) {
+    //   throw new BadRequestException(ErrCode.E_USER_MAX);
+    // }
     if (userReq.role == UserRole.Staff) {
       CheckRoleStaff(userReq, StaffRole.Account);
     }
@@ -115,15 +120,20 @@ export class UsersService {
           user.owner = user.id;
         } else if (user.role == UserRole.Manager || user.role == UserRole.Staff) {
           // admin create manager or staff -> must select manager
-          if (!user.manager) {
-            throw new BadRequestException('MissingManager')
-          }
-          const manager = await this.findOne(user.manager, { throwIfFail: true });
-          // set owner of new user to owner of the selected manager
-          if (manager.role == UserRole.Owner) {
-            user.owner = manager._id;
+          let checkrole = CheckRoleStaffCreateUser(createUserDto, StaffRole.Account);
+          if (checkrole) {
+            user.owner = user.id;
           } else {
-            user.owner = manager.owner;
+            if (!user.manager) {
+              throw new BadRequestException('MissingManager')
+            }
+            const manager = await this.findOne(user.manager, { throwIfFail: true });
+            // set owner of new user to owner of the selected manager
+            if (manager.role == UserRole.Owner) {
+              user.owner = manager._id;
+            } else {
+              user.owner = manager.owner;
+            }
           }
         }
         if (user.role != UserRole.Admin
@@ -133,7 +143,7 @@ export class UsersService {
         }
       }
     }
-
+    
     if (user.role == UserRole.Staff) {
       this.mailService.sendInfoStaff(user, createUserDto.password)
         .then((res) => {
@@ -205,6 +215,8 @@ export class UsersService {
 
   async checkTotalStaff(userReq: JwtUser) {
     const { total } = await this.findAll(userReq, {});
+    //let packkage = await this.packkagesService.findLevelAccount(userReq.levelAccount || LevelAccount.FREE);
+    //let checkSize = (packkage?.staffNumber || LEVEL_ACCOUNT[userReq.levelAccount || LevelAccount.FREE].STAFF);
     return total > LEVEL_ACCOUNT[userReq.levelAccount || LevelAccount.FREE].STAFF;
   }
 
@@ -213,7 +225,10 @@ export class UsersService {
 
     const cond = filterParams(query, ['createdBy']);
     const cmd = this.userModel.find(cond)
-      .populate("owner");
+      .populate({
+        path: 'owner',
+        select: 'username fullName'
+      })
     // .populate("manager");
 
     if (query.search) {
@@ -282,6 +297,23 @@ export class UsersService {
     if (options?.password) {
       cmd.select("+password")
     }
+    if (options?.throwIfFail)
+      cmd.orFail(new NotFoundException(ErrCode.E_USER_NOT_FOUND))
+
+    return cmd.exec()
+  }
+
+  findOneUser(id: string, options?: { throwIfFail?: boolean, password?: boolean, lean?: boolean }, authUser?: JwtUser) {
+    const cmd = this.userModel.findById(id)
+    
+    if (options?.lean) {
+      cmd.lean({ autopopulate: true })
+    }
+    if (options?.password) {
+      cmd.select("+password")
+    }
+    if(authUser.role != UserRole.Admin)
+      cmd.byTenant(authUser?.owner)
     if (options?.throwIfFail)
       cmd.orFail(new NotFoundException(ErrCode.E_USER_NOT_FOUND))
 
@@ -390,26 +422,27 @@ export class UsersService {
     //   }
     // }
 
-    const userC = await this.userModel.findById(id)
-      .orFail(new NotFoundException(ErrCode.E_USER_NOT_FOUND))
-      .exec();
-    if (updateUserDto.staffCode && updateUserDto.staffCode != userC.staffCode) {
+    let user = this.userModel.findById(id);
+    if(userReq?.role != UserRole.Admin){
+      user.orFail(new NotFoundException(ErrCode.E_USER_NOT_FOUND))
+    }
+    const userC = await user.exec();
+    if (userC && updateUserDto.staffCode && updateUserDto.staffCode != userC?.staffCode) {
       const staffCode = await this.isStaffCodeExist(updateUserDto.staffCode, userReq);
       if (staffCode) {
         throw new BadRequestException(ErrCode.E_STAFF_CODE_EXISTED);
       }
     }
 
-    if (updateUserDto.phone && updateUserDto.phone != userC.phone) {
+    if (userC && updateUserDto.phone && updateUserDto.phone != userC?.phone) {
       const phoneNumber = await this.isPhoneNumberExist(updateUserDto.phone);
       if (phoneNumber) {
         throw new BadRequestException(ErrCode.E_USER_PHONE_EXISTED);
       }
     }
 
-    const cmd = this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true })
-      .orFail(new NotFoundException(ErrCode.E_USER_NOT_FOUND))
-    return cmd.exec();
+    return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true })
+    .orFail(new NotFoundException(ErrCode.E_USER_NOT_FOUND)).exec();
   }
 
   async updateCurrencyUnit(updateUserCurrencyUnitDto: UpdateUserCurrencyUnitDto, userReq: JwtUser) {
@@ -751,6 +784,16 @@ export class UsersService {
     return user.levelAccount;
   }
 
+  async getCommission(idOwner: string, check?: Boolean) {
+    const cmd = this.userModel.findById(idOwner)
+    if (check) {
+      cmd.orFail(new NotFoundException(ErrCode.E_USER_NOT_FOUND))
+    }
+    const user = await cmd.exec()
+    
+    return user?.commission;
+  }
+
   // statistic the number of users this month compared to the previous month
   async countUserMonth(userReq: JwtUser, date?: Date) {
     if (!date) {
@@ -910,6 +953,24 @@ export class UsersService {
       ]
       total += totalCmd;
     }
+
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet('Countries List');
+    
+    worksheet.columns = [
+      { key: 'year', header: 'Năm' },
+      { key: 'totalyear', header: 'Tổng khách hàng trong năm' },
+      { key: 'month', header: 'Tháng' },
+      { key: 'total', header: 'Tổng khách hàng trong tháng' },
+    ];
+    worksheet.addRow({totalyear:total,year: year.getFullYear()});
+    data.forEach((item) => {
+      worksheet.addRow(item);
+    });
+    
+    const exportPath = path.resolve(__dirname, 'data.xlsx');
+
+    await workbook.xlsx.writeFile(exportPath);
     return { total, year: year.getFullYear(), data };
   }
 }

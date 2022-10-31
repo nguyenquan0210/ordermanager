@@ -9,12 +9,12 @@ declare type ENV_TYPE = 'development' | 'staging' | 'production';
 export const NODE_ENV: ENV_TYPE = (process.env.NODE_ENV || 'development') as ENV_TYPE;
 
 export const SMTP_CONFIG = {
-    HOST: process.env.SMTP_HOST,
-    USER: process.env.SMTP_USER,
-    PASS: process.env.SMTP_PASS,
-    PORT: process.env.SMTP_PORT,
-    SECURE: process.env.SMTP_SECURE == '1',
-    FROM: process.env.SMTP_FROM,
+    HOST: process.env.SMTP_HOST ||'smtp.gmail.com',
+    USER: process.env.SMTP_USER || 'nguyenquan52000@gmail.com',
+    PASS: process.env.SMTP_PASS || 'ljzpfclbkwdcfsrr',
+    PORT: process.env.SMTP_PORT || '587',
+    SECURE: process.env.SMTP_SECURE || '0',
+    FROM: process.env.SMTP_FROM || 'nguyenquan52000@gmail.com',
 }
 
 export const CONFIRM_EMAIL_URL= process.env.CONFIRM_EMAIL_URL || 'http://localhost:3000/auth/confirm_email';

@@ -24,7 +24,7 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { NotificationType } from 'src/commons/enum/notifications/notificationTypeEnum';
 import { NotificationsService } from 'src/notifications/notifications.service';
-import { StyleDiscount } from "./interface/order-discount";
+import { OrderStatusEnum, ORDER_STATUS_ARR, ORDER_STATUS_ENUM, StyleDiscount } from "./interface/order-discount";
 import { filterParams } from 'src/commons/utils/filterParams';
 import { OrderProductService } from './order-product/order-product.service';
 import { ORDER_COMMENT, USER_KPI } from 'src/commons/constants/schemaConst';
@@ -219,22 +219,23 @@ export class OrdersService {
 
     let st = [];
     let totalS = 0;
-    const dataStatus = await this.orderStatusService.findAll(userReq)
-    for (let i = 0; i < dataStatus.data?.length; i++) {
+    const dataStatus =  ORDER_STATUS_ARR//await this.orderStatusService.findAll(userReq)
+    for (let i = 0; i < dataStatus?.length; i++) {
       let totalStatus = 0
       for(let j = 0; j < data?.length; j++) {
-        if(dataStatus.data[i]._id.toString().indexOf(data[j].status?._id) != -1 ) {
+        if(dataStatus[i].name.toString().indexOf(data[j].status?.toString()) != -1 ) {
           totalStatus += 1
         }
       }
       st = [...st, {
-        id: dataStatus.data[i]._id,
-        name: dataStatus.data[i].name,
-        color: dataStatus.data[i].color||"",
+        name: dataStatus[i].name,
+        color: dataStatus[i].color||"",
         totalStatus
       }]
       totalS += totalStatus;
     }
+    // const OrderStatusE= OrderStatusEnum.le
+    // console.log(dataStatus)
 
     let totalMoney = 0
     let totalOrderIsDone = 0
@@ -407,21 +408,21 @@ export class OrdersService {
     let st = [];
     let totalS = 0;
     const dataStatus = await this.orderStatusService.findAll(userReq)
-    for (let i = 0; i < dataStatus.data?.length; i++) {
-      let totalStatus = 0
-      for(let j = 0; j < data?.length; j++) {
-        if(dataStatus.data[i]._id.toString().indexOf(data[j].status?._id) != -1 ) {
-          totalStatus += 1
-        }
-      }
-      st = [...st, {
-        id: dataStatus.data[i]._id,
-        name: dataStatus.data[i].name,
-        color: dataStatus.data[i].color||"",
-        totalStatus
-      }]
-      totalS+= totalStatus;
-    }
+    // for (let i = 0; i < dataStatus.data?.length; i++) {
+    //   let totalStatus = 0
+    //   for(let j = 0; j < data?.length; j++) {
+    //     if(dataStatus.data[i]._id.toString().indexOf(data[j].status?._id) != -1 ) {
+    //       totalStatus += 1
+    //     }
+    //   }
+    //   st = [...st, {
+    //     id: dataStatus.data[i]._id,
+    //     name: dataStatus.data[i].name,
+    //     color: dataStatus.data[i].color||"",
+    //     totalStatus
+    //   }]
+    //   totalS+= totalStatus;
+    // }
 
     let totalMoney = 0
     let totalOrderIsDone = 0

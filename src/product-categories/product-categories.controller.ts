@@ -26,6 +26,7 @@ export class ProductCategoriesController {
 
   @Post()
   create(@Body() createProductCategoryDto: CreateProductCategoryDto, @AuthUser() authUser: JwtUser) {
+    console.log(true)
     return this.productCategoriesService.create(createProductCategoryDto, authUser);
   }
 
@@ -33,12 +34,14 @@ export class ProductCategoriesController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'offset', required: false, type: Number })
   @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'isOwner', required: false, type: Boolean })
   findAll(@AuthUser() authUser: JwtUser,
     @Query('limit', new DefaultValuePipe('0'), ParseIntPipe) limit?: number,
     @Query('offset', new DefaultValuePipe('0'), ParseIntPipe) offset?: number,
-    @Query('search') search?: string
+    @Query('search') search?: string,
+    @Query('isOwner') isOwner?: boolean
   ) {
-    return this.productCategoriesService.findAll(authUser, { limit, offset, search });
+    return this.productCategoriesService.findAll(authUser, { limit, offset, search, isOwner });
   }
 
   @Get(':id')

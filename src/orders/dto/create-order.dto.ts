@@ -1,6 +1,6 @@
 import { IsArray, IsMongoId, IsOptional, IsString, IsDateString, IsNumber, ValidateNested, IsBoolean, IsEnum } from "class-validator";
 import { Type } from 'class-transformer';
-import { StyleDiscount } from "../interface/order-discount";
+import { OrderStatusEnum, StyleDiscount } from "../interface/order-discount";
 export class CreateOrderDto {
    
     @IsString()
@@ -14,7 +14,8 @@ export class CreateOrderDto {
     @IsOptional()
     description?: string;
 
-    @IsMongoId()
+    @IsEnum(OrderStatusEnum)
+    @IsOptional()
     status: string;
 
     @IsMongoId()

@@ -26,10 +26,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             throw new UnauthorizedException();
         }
 
-        let levelAccount = LevelAccount.FREE;
-        if(payload.role != UserRole.Admin){
-            levelAccount = await this.userService.getLevelAccount(payload?.owner, false);
-        }
+        let levelAccount = LevelAccount.ADVANCE;
+        // if(payload.role != UserRole.Admin){
+        //     levelAccount = await this.userService.getLevelAccount(payload?.owner, false);
+        // }
 
         const ret = {
             userId: payload.id,
@@ -39,7 +39,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             staffRole: user.staffRole,
             // manager: payload.manager,
             fullName: user.fullName,
-            levelAccount: levelAccount || LevelAccount.FREE
+            levelAccount: levelAccount || LevelAccount.ADVANCE
         }
         if (ret.role == UserRole.Owner) {
             ret.owner = payload.id;

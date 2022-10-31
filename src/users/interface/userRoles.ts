@@ -3,6 +3,7 @@ export enum UserRole {
     Admin = 'admin',
     Owner = 'owner', // user who use service
     Manager = 'manager', //
+    Customer = 'customer', //
 }
 
 export enum StaffRole {
@@ -12,6 +13,8 @@ export enum StaffRole {
     Profile = 'Profile',
     Accountant = 'Accountant',
     AssignTodo = 'AssignTodo',
+    Manager = 'Manager',
+
 }
 
 export const AllStaffRole = [
