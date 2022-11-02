@@ -13,6 +13,8 @@ export const ErrCode = {
 
     E_FEEDBACK_NOT_FOUND: 'NotFoundFeedback',
 
+    E_Department_NOT_FOUND: 'NotFoundDepartment',
+
     E_OTP_EXPIRED: 'YourCodeExpired',
     E_OTP_NOT_MATCH: 'CodeNotMatch',
 

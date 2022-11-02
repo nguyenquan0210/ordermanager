@@ -4,7 +4,8 @@ import { OrderStatusEnum, StyleDiscount } from "../interface/order-discount";
 export class CreateOrderDto {
    
     @IsString()
-    name: string;
+    @IsOptional()
+    name?: string;
 
     // @IsString()
     // @IsOptional()
@@ -14,9 +15,12 @@ export class CreateOrderDto {
     @IsOptional()
     description?: string;
 
+    /**
+     * @example [Cancel, Processing, Delivering, Paid, Received]
+     */
     @IsEnum(OrderStatusEnum)
     @IsOptional()
-    status: string;
+    status: OrderStatusEnum;
 
     @IsMongoId()
     @IsOptional()
@@ -27,19 +31,19 @@ export class CreateOrderDto {
     @IsOptional()
     carerStaffs: string[];
 
-    @IsMongoId()
-    customers: string;
+    // @IsMongoId()
+    // customers: string;
 
     // @IsArray()
     @ValidateNested({ each: true })
     @Type(() => OrderProductDto)
     products: OrderProductDto[];
    
-    @IsDateString()
-    startDate?: Date;
+    // @IsDateString()
+    // startDate?: Date;
 
-    @IsDateString()
-    dueDate?: Date;
+    // @IsDateString()
+    // dueDate?: Date;
 
     @IsString()
     @IsOptional()

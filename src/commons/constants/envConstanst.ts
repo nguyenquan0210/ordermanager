@@ -17,6 +17,8 @@ export const SMTP_CONFIG = {
     FROM: process.env.SMTP_FROM || 'nguyenquan52000@gmail.com',
 }
 
+export const API_KEY_CURRENCY = process.env.API_KEY_CURRENCY || 'b5202fe217-90088492ba-rknpqs';
+
 export const CONFIRM_EMAIL_URL= process.env.CONFIRM_EMAIL_URL || 'http://localhost:3000/auth/confirm_email';
 
 export const GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_CREDENTIALS || '/app/firebase-key.json';
