@@ -64,20 +64,24 @@ export class OrdersService {
     job.start();
   }
 
+  private RadomOrderCode
+
   async create(CreateOrderDto: CreateOrderDto, userReq: JwtUser) {
     // CheckRoleStaff(userReq, StaffRole.Order)
 
-    const today = new Date();
-    today.setHours(today.getHours() - 24)
-    const dueDate = new Date(CreateOrderDto.dueDate)
-    if( dueDate.getTime() < today.getTime() ) {
-      throw new BadRequestException(ErrCode.E_ORDER_DUE_DATE);
-    }
+    // const today = new Date();
+    // today.setHours(today.getHours() - 24)
+    // const dueDate = new Date(CreateOrderDto.dueDate)
+    // if( dueDate.getTime() < today.getTime() ) {
+    //   throw new BadRequestException(ErrCode.E_ORDER_DUE_DATE);
+    // }
 
-    const orderCode = new Date().getTime().toString().slice(0, 10)
-    const checkOrderCode = await this.isOrderCodeExist(orderCode, userReq);
-    if (checkOrderCode) {
-      throw new BadRequestException(ErrCode.E_ORDER_CODE_EXISTED);
+    let orderCode = new Date().getTime().toString().slice(0, 10) + (Math.floor(Math.random() * (99999 - 10000 + 1) ) + 10000);
+    let checkOrderCode = true;
+    while (checkOrderCode) {
+      checkOrderCode = await this.isOrderCodeExist(orderCode, userReq);
+      orderCode = new Date().getTime().toString().slice(0, 10) + (Math.floor(Math.random() * (99999 - 10000 + 1) ) + 10000);
+      //throw new BadRequestException(ErrCode.E_ORDER_CODE_EXISTED);
     }
 
     if(CreateOrderDto.products?.length > 0){
@@ -94,7 +98,7 @@ export class OrdersService {
             throw new BadRequestException('product must be a mongodb id');
         }
         const orderProduct = await this.productModel.findById(CreateOrderDto.products[index].product)
-          .byTenant(userReq.owner)
+          .byTenant(userReq.owner, userReq.role == UserRole.Customer? true: false)
           .populateTenant('name')
           .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
           .exec();
@@ -106,7 +110,7 @@ export class OrdersService {
 
       for (let index = 0; index < CreateOrderDto.products?.length; index++) {
         const orderProduct = await this.productModel.findById(CreateOrderDto.products[index].product)
-          .byTenant(userReq.owner)
+          .byTenant(userReq.owner, userReq.role == UserRole.Customer? true: false)
           .populateTenant('name')
           .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
           .exec();
@@ -159,6 +163,7 @@ export class OrdersService {
 
       order.orderCode = orderCode;
       order.totalMoney = totalSurchargeMoney + totalProductMoney - totalDiscountMoney ;
+      console.log(order)
       return order.save();
     } else {
       throw new BadRequestException("Products cannot be empty");
