@@ -43,6 +43,7 @@ export const ErrCode = {
     E_TODO_FILE_NOT_FOUND: 'NotFoundTodoAttachment',
     E_TODO_DEMAND_NOT_FOUND: 'NotFoundDemand',
     E_TODO_DEMAND_STATUS_NOT_FOUND: 'NotFoundDemandStatus',
+    E_DEPARTMENT_NOT_FOUND: 'NotFoundDepartment',
 
     E_PRODUCT_CTG_NOT_FOUND: 'NotFoundProductCategory',
     E_PRODUCT_STATUS_NOT_FOUND: 'NotFoundProductStatus',

@@ -5,6 +5,7 @@ export const PRODUCT_LABEL = 'product_label';
 export const PRODUCT_HISTORY = 'product_history';
 export const PRODUCT_RELATE_CUSTOMER = 'product_relate_customer';
 export const PRODUCT_RELATE_TODO = 'product_relate_todo';
+export const PRODUCT_RELATE_DEPARTMENT = 'product_relate_department';
 
 export const CUSTOMER_LABEL = 'customer_label';
 export const CUSTOMER_DEMAND_GROUP = 'customer_demand_group';

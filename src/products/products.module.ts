@@ -6,7 +6,7 @@ import { Product, ProductSchema } from './entities/product.entity';
 import { AttributesModule } from 'src/attributes/attributes.module';
 import { ProductCategorySchema } from 'src/product-categories/entities/product-category.entity';
 import {
-  PRODUCT_CTG, PRODUCT_STATUS, PRODUCT_LABEL, PRODUCT_HISTORY, PRODUCT_RELATE_CUSTOMER, PRODUCT_RELATE_TODO
+  PRODUCT_CTG, PRODUCT_STATUS, PRODUCT_LABEL, PRODUCT_HISTORY, PRODUCT_RELATE_CUSTOMER, PRODUCT_RELATE_TODO, PRODUCT_RELATE_DEPARTMENT
 } from 'src/commons/constants/schemaConst';
 import { ProductStatusSchema } from 'src/product-status/entities/product-status.entity';
 import { LabelSchema } from 'src/labels/entities/label.entity';
@@ -29,6 +29,8 @@ import { OrderProductSchema } from 'src/orders/entities/order-product.entity';
 import { ORDER_PRODUCT } from 'src/commons/constants/schemaConst';
 import { UsersModule } from 'src/users/users.module';
 import { ResourcesModule } from 'src/resources/resources.module';
+import { ProductRelateDepartmentSchema } from './entities/product-ralate-department.entity';
+import { RelateDepartmentService } from './product-department/relate-department.service';
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import { ResourcesModule } from 'src/resources/resources.module';
       { name: PRODUCT_LABEL, useFactory: () => LabelSchema },
       { name: PRODUCT_RELATE_CUSTOMER, useFactory: () => ProductRelateCustomerSchema },
       { name: PRODUCT_RELATE_TODO, useFactory: () => ProductRelateTodoCustomerSchema },
+      { name: PRODUCT_RELATE_DEPARTMENT, useFactory: () => ProductRelateDepartmentSchema},
       { name: Notifications.name, useFactory: () => NotificationsSchema },
       { name: ORDER_PRODUCT, useFactory: () => OrderProductSchema },      
       {
@@ -65,6 +68,7 @@ import { ResourcesModule } from 'src/resources/resources.module';
     HistoriesService, 
     RelateCustomerService, 
     RelateTodoService, 
+    RelateDepartmentService, 
     ]
 })
 export class ProductsModule { }

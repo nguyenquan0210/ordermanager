@@ -38,6 +38,8 @@ import { OrderProductDocument, OrderProduct } from 'src/orders/entities/order-pr
 import { UsersService } from 'src/users/users.service';
 import { ResourcesService } from 'src/resources/resources.service';
 import { ResourceType } from 'src/resources/inteface/resourceType';
+import { RelateDepartmentService } from './product-department/relate-department.service';
+import { CreateRelateArrDepartmentDto } from './product-department/dto/create-product-rle-arrDepartment.dto';
 
 @Injectable()
 export class ProductsService {
@@ -49,6 +51,7 @@ export class ProductsService {
     @Inject(AttrSubject.Product) private attributeService: AttributesDynamicService,
     private readonly historyService: HistoriesService,
     private readonly relateService: RelateCustomerService,
+    private readonly relateDepartmentService: RelateDepartmentService,
     private readonly relateTodoService: RelateTodoService,
     private readonly notificationService: NotificationsService,
     private readonly usersService: UsersService,
@@ -849,6 +852,68 @@ export class ProductsService {
     };
 
     const result = await this.relateTodoService.removeRelateTodoMultiple(doc._id, todoIds);
+    const change = _.omit(difference(doc.toJSON(), history.before), ['updatedAt']);
+    this.historyService.create({ ...history, change }, authUser);
+
+    return result;
+  }
+  //#endregion
+
+  //#region add Relate Departments
+  async addRelateDepartments(productId: string, createRelateArrDepartmentDto: CreateRelateArrDepartmentDto, authUser: JwtUser) {
+    const doc = await this.productModel.findById(productId)
+      .byTenant(authUser.owner, authUser?.role == UserRole.Admin)
+      .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
+      .exec();
+
+    const history = {
+      product: doc._id,
+      before: doc.toJSON(),
+      updatedBy: authUser.userId,
+      status: StatusHistory.addRelate
+    };
+
+    const result = this.relateDepartmentService.addRelateDepartment(doc, createRelateArrDepartmentDto, authUser);
+    const change = _.omit(difference(createRelateArrDepartmentDto.department.toString(), history.before), ['updatedAt']);
+    this.historyService.create({ ...history, change }, authUser);
+
+    return result;
+  }
+
+  async updateRelateDepartments(productId: string, createRelateArrDepartmentDto: CreateRelateArrDepartmentDto, authUser: JwtUser) {
+    const doc = await this.productModel.findById(productId)
+      .byTenant(authUser.owner, authUser?.role == UserRole.Admin)
+      .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
+      .exec();
+
+    const history = {
+      product: doc._id,
+      before: doc.toJSON(),
+      updatedBy: authUser.userId,
+      status: StatusHistory.addRelate
+    };
+
+    const result = this.relateDepartmentService.updateRelateDepartment(doc, createRelateArrDepartmentDto, authUser);
+    const change = _.omit(difference(createRelateArrDepartmentDto.department.toString(), history.before), ['updatedAt']);
+    this.historyService.create({ ...history, change }, authUser);
+
+    return result;
+  }
+
+  async removeRelateDepartments(productId: string, departmentIds: string[], authUser: JwtUser) {
+    const doc = await this.productModel.findById(productId)
+      .byTenant(authUser.owner, authUser?.role == UserRole.Admin)
+      .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
+      .exec();
+
+    const history = {
+      product: doc._id,
+      before: doc.toJSON(),
+      updatedBy: authUser.userId,
+      status: StatusHistory.removeRelate
+    };
+
+    const result = await this.relateDepartmentService.removeRelateDepartmentMultiple(doc, departmentIds);
     const change = _.omit(difference(doc.toJSON(), history.before), ['updatedAt']);
     this.historyService.create({ ...history, change }, authUser);
 

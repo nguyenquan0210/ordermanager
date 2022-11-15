@@ -20,6 +20,7 @@ import { AllowPublic } from 'src/decors/allow-public.decorator';
 import { DepartmentsService } from './department.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { Currency } from './interface/currencies';
+import { CreateRelateArrProductDto } from './dto/create-relate-product.dto';
 
 //import { s } from 'api';
 
@@ -84,5 +85,20 @@ export class DepartmentsController {
     remove(@Param('id') id: string, @AuthUser() authUser: JwtUser) {
         return this.departmentService.remove(id, authUser);
     }
-
+    @Post(':id/products')
+    async addRelateProducts(@Param('id') id: string,
+      @Body() createRelateArrProductDto: CreateRelateArrProductDto,
+      @AuthUser() authUser: JwtUser
+    ) {
+      const result = await this.departmentService.addRelateProducts(id, createRelateArrProductDto, authUser);
+      return new OkRespone({ data: result });
+    }
+  
+    @Delete(':id/products')
+    async removeRelateProducts(@Param('id') id: string,
+      @Body() productIds: string[],
+      @AuthUser() authUser: JwtUser) {
+      const result = await this.departmentService.removeRelateProducts(id, productIds, authUser);
+      return new OkRespone({ data: result });
+    }
 }

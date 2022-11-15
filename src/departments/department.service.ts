@@ -9,24 +9,34 @@ import { Paginate } from 'src/commons/dto/paginate.dto';
 import { Sorting } from 'src/commons/dto/sorting';
 import { Department, DepartmentDocument } from './entities/department.entity';
 import { CreateDepartmentDto } from './dto/create-department.dto';
-import { UserRole } from 'src/users/interface/userRoles';
+import { StaffRole, UserRole } from 'src/users/interface/userRoles';
 import { CHECK_SIZE_FILE } from 'src/commons/constants/envConstanst';
 import { QueryDepartment } from './dto/query-department.dto';
 import { API_KEY_CURRENCY } from 'src/commons/constants/envConstanst';
 import fetch from 'node-fetch';
 import { Currency, ListCurrency } from './interface/currencies';
+import { difference } from 'src/commons/utils/difference';
+import { RelateDepartmentService } from 'src/products/product-department/relate-department.service';
+import { CheckRoleStaff } from 'src/utils/checkRoleStaff';
+import { CreateRelateArrProductDto } from './dto/create-relate-product.dto';
 
 @Injectable()
 export class DepartmentsService {
 
     constructor(
         @InjectModel(Department.name) private model: Model<DepartmentDocument>,
+        private readonly relateDepartmentService: RelateDepartmentService,
 
     ) {
     }
     async createDepartment(createDepartmentDto: CreateDepartmentDto, authUser: JwtUser) {
-        
-        return new this.model(createDepartmentDto).withTenant(createDepartmentDto.userId|| authUser?.owner).save();
+        const department = await this.model.findOne(createDepartmentDto)
+        .byTenant(authUser.owner,false)
+        .exec();
+        if(!department){
+            return new this.model(createDepartmentDto).withTenant(createDepartmentDto.userId|| authUser?.owner).save();
+        }
+        return this.model.findByIdAndUpdate(department._id, department).exec();
     }
 
     async currency(currency?: Currency, money?: number) {
@@ -90,6 +100,16 @@ export class DepartmentsService {
         return result.orFail(new NotFoundException(ErrCode.E_Department_NOT_FOUND)).exec();
     }
 
+    async getDepartment(idOwner: string, check?: Boolean) {
+        const cmd = this.model.findOne().byTenant(idOwner)
+        if (check) {
+          cmd.orFail(new NotFoundException(ErrCode.E_USER_NOT_FOUND))
+        }
+        const result = await cmd.exec()
+        
+        return result?._id;
+      }
+
     async isDeletedConfirmation(id: string, userReq: JwtUser) {
         const doc = await this.model.findById(id)
         .byTenant(userReq.owner, userReq.role != UserRole.Admin?true:false)
@@ -108,5 +128,30 @@ export class DepartmentsService {
         const key = `Department/${owner}/${id}/${fileName}`;
         return signedUrl(key);
     }
+
+    //#region Relate product in todo
+  async addRelateProducts(todoId: string, createRelateArrProductDto: CreateRelateArrProductDto, authUser: JwtUser) {
+    const doc = await this.model.findById(todoId)
+      .byTenant(authUser.owner, CheckRoleStaff(authUser, StaffRole.Product)?true: authUser?.role == UserRole.Admin? true: false )
+      .orFail(new NotFoundException(ErrCode.E_DEPARTMENT_NOT_FOUND))
+      .exec();
+
+    const result = this.relateDepartmentService.addRelateProduct(doc._id, createRelateArrProductDto, authUser);
+
+    return result;
+  }
+
+  async removeRelateProducts(todoId: string, productIds: string[], authUser: JwtUser) {
+    const doc = await this.model.findById(todoId)
+      .byTenant(authUser.owner, CheckRoleStaff(authUser, StaffRole.Product)?true:false)
+      .orFail(new NotFoundException(ErrCode.E_DEPARTMENT_NOT_FOUND))
+      .exec();
+
+    const result = await this.relateDepartmentService.removeRelateProductMultiple(doc._id, productIds);
+
+    return result;
+  }
+
+  //#endregion
 }
 

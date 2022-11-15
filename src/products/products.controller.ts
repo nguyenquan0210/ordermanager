@@ -21,6 +21,7 @@ import { AllowPublic } from 'src/decors/allow-public.decorator';
 import { Request as ExRequest } from 'express';
 import { ArrayObjectIdValidationPipe } from 'src/commons/pipes/array-object-id-validation.pipe';
 import { SortOrder } from 'src/commons/dto/sorting';
+import { CreateRelateArrDepartmentDto } from './product-department/dto/create-product-rle-arrDepartment.dto';
 
 @ApiTags('Product')
 @Controller('products')
@@ -386,6 +387,32 @@ export class ProductsController {
     @Body(ArrayObjectIdValidationPipe) todoIds: string[],
     @AuthUser() authUser: JwtUser) {
     const result = await this.productsService.removeRelateTodos(id, todoIds, authUser);
+    return new OkRespone({ data: result });
+  }
+  //#endregion
+
+  //#region relate Departments
+  @Post(':id/departments')
+  async addRelateDepartments(@Param('id') id: string,
+  @Body() createRelateArrDepartmentDto: CreateRelateArrDepartmentDto,
+    @AuthUser() authUser: JwtUser) {
+    const result = await this.productsService.addRelateDepartments(id, createRelateArrDepartmentDto, authUser);
+    return new OkRespone({ data: result });
+  }
+
+  @Put(':id/departments')
+  async updateRelateDepartments(@Param('id') id: string,
+    @Body() createRelateArrDepartmentDto: CreateRelateArrDepartmentDto,
+    @AuthUser() authUser: JwtUser) {
+    const result = await this.productsService.updateRelateDepartments(id, createRelateArrDepartmentDto, authUser);
+    return new OkRespone({ data: result });
+  }
+
+  @Delete(':id/departments')
+  async removeRelateDepartments(@Param('id') id: string,
+    @Body(ArrayObjectIdValidationPipe) todoIds: string[],
+    @AuthUser() authUser: JwtUser) {
+    const result = await this.productsService.removeRelateDepartments(id, todoIds, authUser);
     return new OkRespone({ data: result });
   }
   //#endregion
