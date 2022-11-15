@@ -6,11 +6,13 @@ import { UsersService } from 'src/users/users.service';
 import { JwtUser } from './inteface/jwtUser';
 import { LevelAccount, UserRole } from 'src/users/interface/userRoles';
 import { JwtPayload } from './inteface/jwtPayload';
+import { DepartmentsService } from 'src/departments/department.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(
-        private userService: UsersService
+        private userService: UsersService,
+        private departmentsService: DepartmentsService
     ) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -27,9 +29,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         }
 
         let levelAccount = LevelAccount.ADVANCE;
-        // if(payload.role != UserRole.Admin){
-        //     levelAccount = await this.userService.getLevelAccount(payload?.owner, false);
-        // }
+      
+
+        let department = await this.departmentsService.getDepartment(payload?.owner, false);
 
         const ret = {
             userId: payload.id,
@@ -39,7 +41,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             staffRole: user.staffRole,
             // manager: payload.manager,
             fullName: user.fullName,
-            levelAccount: levelAccount || LevelAccount.ADVANCE
+            levelAccount: levelAccount || LevelAccount.ADVANCE,
+            department: department
         }
         if (ret.role == UserRole.Owner) {
             ret.owner = payload.id;

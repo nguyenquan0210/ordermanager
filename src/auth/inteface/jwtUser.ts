@@ -9,4 +9,5 @@ export interface JwtUser {
     // manager?: string,
     fullName?: string,
     levelAccount?: LevelAccount, 
+    department?: string, 
 }
