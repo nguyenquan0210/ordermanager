@@ -208,11 +208,11 @@ export class RelateDepartmentService {
         // return this.model.deleteMany({ department: departmentId, product: { $in: productIds } })
         //     .exec();
         productIds?.forEach(async id => {
-            const result = await this.model.find({ department: departmentId, product: id })
+            const result = await this.model.findOne({ department: departmentId, product: id })
             .exec();
             if(result){
                 const product = await this.productModel.findById(id).exec();
-                product.quantity += result.quantity;
+                product.quantity += result?.quantity;
             }
         })
         return this.model.deleteMany({ department: departmentId, product: { $in: productIds } })

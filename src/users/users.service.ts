@@ -973,4 +973,50 @@ export class UsersService {
     await workbook.xlsx.writeFile(exportPath);
     return { total, year: year.getFullYear(), data };
   }
+
+  async testExcelToJson(file: Express.Multer.File,) {
+    const workbook = new Excel.Workbook();
+    const exportPath = path.resolve(__dirname, 'data.xlsx');
+    console.log(exportPath)
+
+    await workbook.xlsx.readFile(exportPath);
+    //const workbookReader = new Excel.stream.xlsx.WorkbookReader(exportPath);
+    let jsonData = [];
+    workbook.worksheets.forEach(function(sheet) {
+        // read first row as data keys
+        let firstRow = sheet.getRow(16);
+        let d = 2;
+        // while(firstRow.values){
+        //   firstRow = sheet.getRow(d)
+        //   d++;
+        //   console.log(firstRow.values)
+        //   console.log(d)
+        // }
+         console.log(firstRow.cellCount)
+         console.log(firstRow.values)
+        if (!firstRow.cellCount) return;
+        let keys = firstRow.values;
+        sheet.eachRow((row, rowNumber) => {
+            if (rowNumber == 1) return;
+            let values = row.values
+            //console.log(rowNumber,values)
+            let obj = {};
+            for (let i = 1; i < keys.length; i ++) {
+              //console.log(i,values[i])
+                if(values[i] != undefined)
+                  obj[keys[i]] = values[i];
+            }
+            //console.log(obj)
+            if(obj?.['undefined'] !=0 && (typeof obj?.['Tổng khách hàng trong năm']) == typeof 1){
+              //console.log(obj?.['Tổng khách hàng trong năm'])
+              jsonData.push(obj);
+            }
+        })
+
+    });
+    console.log(jsonData);
+   // console.log(workbookReader)
+    return jsonData // worksheet
+  }
+ 
 }
