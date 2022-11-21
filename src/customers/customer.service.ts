@@ -560,8 +560,10 @@ export class CustomerService {
       .exec();
 
     const oldStaffs = await this._customerRelateStaff.findAll({ customer: id });
-    const oldIds = oldStaffs.map(staff => staff._id);
-    await this._customerRelateStaff.remove(id, oldIds);
+    if(oldStaffs){
+      const oldIds = oldStaffs.map(staff => staff._id);
+      await this._customerRelateStaff.remove(id, oldIds);
+    }
     const result = this._customerRelateStaff.createAsync(doc, staffIds);
     return result;
   }

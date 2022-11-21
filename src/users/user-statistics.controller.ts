@@ -1,8 +1,11 @@
 import {
-    Controller, Get, Post, Body, Param, Delete, Request,
-    Put, Query, DefaultValuePipe, ParseIntPipe
+    Controller, Get, Post, Body, Param, Delete, Req,
+    Put, UseInterceptors, Query, DefaultValuePipe, ParseIntPipe, Res, UploadedFiles, ParseBoolPipe
 } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBody, ApiConsumes, ApiExcludeEndpoint, ApiParam, ApiQuery, ApiTags
+} from '@nestjs/swagger';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { AuthUser } from 'src/decors/user.decorator';
 import { JwtUser } from 'src/auth/inteface/jwtUser';
 import { BearerJwt } from 'src/decors/bearer-jwt.decorator';
@@ -11,6 +14,8 @@ import { SortOrder } from 'src/commons/dto/sorting';
 import { UsersService } from './users.service';
 import { Roles } from 'src/decors/roles.decorator';
 import { UserRole } from './interface/userRoles';
+import { FileFieldNameDto, FileUploadDto } from 'src/commons/dto/file-upload.dto';
+import { multerFileFilter } from 'src/configs/multer.cnf';
 
 @ApiTags('Statistics')
 @Controller('statistics/users')
@@ -46,6 +51,28 @@ export class StatisticsController {
         @Query('date') date?: Date,
     ) {
         return this.usersService.findAllUserYear(userReq, date);
+    }
+
+    /**
+  * Upload image
+  */
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        description: 'Normal file.',
+        type: FileUploadDto,
+    })
+    @Post('testExcelToJson')
+    @UseInterceptors(FileFieldsInterceptor([
+        { name: 'file', maxCount: 1 },
+    ], {
+        fileFilter: multerFileFilter(null),
+    }))
+    //@Get('testExcelToJson')
+    @Roles(UserRole.Admin)
+    testExcelToJson(
+        @UploadedFiles() files: { file?: Express.Multer.File[] },
+    ) {
+        return this.usersService.testExcelToJson(files.file[0]);
     }
 
 }
