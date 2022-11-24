@@ -188,6 +188,69 @@ export class ProductsService {
     return { total, data };
   }
 
+  async findAllClient(query?: Paginate & QueryProduct & Sorting) {
+    let filter: FilterQuery<ProductDocument> = {};
+
+    if (query.search) {
+      filter.$text = { $search: `.*${query.search}.*`, $language: "en" };
+    }
+
+    const cond = filterParams(query, ['category', 'malo', 'code']);
+    const cmd = this.productModel.find({ ...filter, ...cond })
+      .byTenant(null, true)
+      .populate({
+        path: 'relateCustomers', select: '-_id',
+        populate: { path: 'customer', select: 'fullName email phone avatar' }
+      })
+      .populate({
+        path: 'relateTodos',
+        populate: { path: 'todo', select: 'name description startDate dueDate priority status' }
+      })
+      .lean({ autopopulate: true })
+
+    // if (query.isOwner) {
+    //   cmd.where('owner', userReq.owner);
+    // }
+    if (query.isHot) {
+      cmd.where('isHot', query.isHot);
+    }
+    if (query.labels) {
+      if (Array.isArray(query.labels) && query.labels.length > 0) {
+        cmd.where('labels').in(query.labels);
+      } else {
+        cmd.where('labels', query.labels);
+      }
+    }
+    if (query.states) {
+      if (Array.isArray(query.states) && query.states.length > 0) {
+        cmd.where('status').in(query.states);
+      } else {
+        cmd.where('status', query.states);
+      }
+    }
+    if (query.fromPrice) {
+      cmd.where('price').gte(query.fromPrice);
+    }
+    if (query.toPrice) {
+      cmd.where('price').lte(query.toPrice);
+    }
+    if (query.limit) {
+      cmd.limit(query.limit);
+    }
+    if (query.offset) {
+      cmd.skip(query.offset);
+    }
+    if (query.sortBy) {
+      cmd.sort({ [query.sortBy]: query.sortOrder })
+    }
+
+    const totalCmd = this.productModel.countDocuments(cmd.getQuery());
+    const [data, total] = await Promise.all([cmd.exec(), totalCmd.exec()]);
+
+    return { total, data };
+  }
+
+
   findOne(id: string, userReq: JwtUser) {
     return this.productModel.findById(id)
       .byTenant(userReq.owner)
