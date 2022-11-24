@@ -31,6 +31,7 @@ import { UsersModule } from 'src/users/users.module';
 import { ResourcesModule } from 'src/resources/resources.module';
 import { ProductRelateDepartmentSchema } from './entities/product-ralate-department.entity';
 import { RelateDepartmentService } from './product-department/relate-department.service';
+import { ClientsController } from './product-client.controller';
 
 @Module({
   imports: [
@@ -61,7 +62,8 @@ import { RelateDepartmentService } from './product-department/relate-department.
     HistoriesController,
     LabelsController,
     RelateCustomerController,
-    ProductsController],
+    ProductsController,
+    ClientsController],
   providers: [
     ProductsService, 
     ProductLabelService, 

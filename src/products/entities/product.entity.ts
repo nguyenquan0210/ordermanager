@@ -63,7 +63,13 @@ export class Product implements ITenant {
     priceSale?: number;
 
     @Prop({ default: 0 }) 
+    priceIn?: number;
+
+    @Prop({ default: 0 }) 
     quantity: number;   
+
+    @Prop({ default: 0 }) 
+    totalQuantity: number;   
 
     @Prop() 
     unit?: string;
