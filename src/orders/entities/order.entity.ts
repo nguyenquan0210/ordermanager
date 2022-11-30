@@ -98,6 +98,9 @@ export class Order implements ITenant {
 
     @Prop({default: false})
     requestConfirmation?: boolean;
+
+    @Prop()
+    checkoutPhoto?: string;
 }
  
 export type OrderDocument = Order & Document;

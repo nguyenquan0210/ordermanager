@@ -1,19 +1,24 @@
 import {
-    Controller, Get, Post, Body, Param, Delete, Request,
-    Put, Query, DefaultValuePipe, ParseIntPipe
+    Controller, Get, Post, Body, Param, Delete, Request, Res,
+    Put, Query, DefaultValuePipe, ParseIntPipe, UseInterceptors, UploadedFiles, UploadedFile,
   } from '@nestjs/common';
+  import { ApiBody, ApiConsumes, ApiExcludeEndpoint, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+  import { OkRespone } from 'src/commons/OkResponse';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerFileFilter, } from 'src/configs/multer.cnf';
   import { OrdersService } from './orders.service';
   import { CreateOrderDto } from './dto/create-order.dto';
   import { UpdateOrderDto } from './dto/update-order.dto';
-  import { ApiQuery, ApiTags } from '@nestjs/swagger';
   import { AuthUser } from 'src/decors/user.decorator';
   import { JwtUser } from 'src/auth/inteface/jwtUser';
   import { BearerJwt } from 'src/decors/bearer-jwt.decorator';
-  import { Request as ExRequest } from 'express';
+  import { Request as ExRequest, Response } from 'express';
   import { SortOrder } from 'src/commons/dto/sorting';
 import { UpdateDoneOrderDto } from './dto/update-done-order.dto';
 import { UpdateCancelOrderDto } from './dto/update-cancel-order.dto';
 import { RequestConfirmationOrderDto } from './dto/request-confirmation-order.dto';
+import { FileUploadDto } from 'src/commons/dto/file-upload.dto';
+import { AllowPublic } from 'src/decors/allow-public.decorator';
   
   @ApiTags('Order')
   @Controller('orders')
@@ -111,5 +116,37 @@ import { RequestConfirmationOrderDto } from './dto/request-confirmation-order.dt
     remove(@Param('id') id: string, @AuthUser() userReq: JwtUser) {
       return this.ordersService.remove(id, userReq);
     }
+
+    /**
+   * Upload Card Photo
+   */
+   @ApiConsumes('multipart/form-data')
+   @ApiBody({
+     description: 'Image file. Support png, jpg, webp',
+     type: FileUploadDto,
+   })
+   @Post(':id/checkout-photo')
+   @UseInterceptors(FileInterceptor('file', {
+     fileFilter: multerFileFilter(['png', 'jpg', 'jpeg', 'webp']),
+   }))
+   async uploadCheckoutPhoto(@Param('id') id: string,
+     @UploadedFile() file: Express.Multer.File,
+     @AuthUser() authUser: JwtUser
+   ) {
+     const result = await this.ordersService.changeCheckoutPhoto(id, file, authUser);
+     return new OkRespone({ data: { _id: result._id, checkoutPhoto: result.checkoutPhoto } });
+   }
+
+   @ApiExcludeEndpoint()
+   @Get('checkoutphoto/:id/:filename')
+   @AllowPublic()
+   async getCheckoutPhoto(@Res() res: Response,
+     @Param('id') id: string,
+     @Param('filename') filename: string,
+     @AuthUser() authUser: JwtUser
+   ) {
+     const url = await this.ordersService.getCheckoutPhotoSignedUrl(id, filename, authUser);
+     return res.redirect(url);
+   }
   }
   
