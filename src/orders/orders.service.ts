@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import _, { map } from 'lodash';
+import { nanoid } from 'nanoid';
 import { FilterQuery, Model } from 'mongoose';
 import { JwtUser } from 'src/auth/inteface/jwtUser';
 import { ErrCode } from 'src/commons/constants/errorConstants';
@@ -36,6 +37,7 @@ import { Customer, CustomerDocument } from 'src/customers/entities/customer.enti
 import { UpdateDoneOrderDto } from './dto/update-done-order.dto';
 import { UpdateCancelOrderDto } from './dto/update-cancel-order.dto';
 import { RequestConfirmationOrderDto } from './dto/request-confirmation-order.dto';
+import { deleteFile, signedUrl } from 'src/commons/utils/s3Client';
 
 @Injectable()
 export class OrdersService {
@@ -1531,4 +1533,33 @@ export class OrdersService {
       .where('createdBy', userId)
       .exec();
   }
+
+  async changeCheckoutPhoto(id: string, file: Express.Multer.File, authResume: JwtUser) {
+    const resume = await this.orderModel.findById(id)
+      .byTenant(authResume.owner)
+      .orFail(new NotFoundException(ErrCode.E_COMMENT_NOT_FOUND))
+      .exec();
+
+    const random = nanoid(16);
+    const url = `order/checkoutphoto/${id}/${random}.png`
+    // const output = await uploadFile({
+    //   file: file,
+    //   filePath: url,
+    //   mimetype: file.mimetype
+    // })
+
+    if (resume.checkoutPhoto) {
+      deleteFile(resume.checkoutPhoto);
+    }
+
+    resume.checkoutPhoto = url;
+    return await resume.save();
+  }
+
+  async getCheckoutPhotoSignedUrl(id: string, fileName: string, authResume?: JwtUser) {
+    const fileKey = `resumes/checkoutphoto/${id}/${fileName}`;
+    const url = await signedUrl(fileKey);
+    return url;
+  }
+  
 }

@@ -117,12 +117,12 @@ export class UsersService {
       } else if (userReq.role == UserRole.Admin) {
         // admin create new owner
         if (user.role == UserRole.Owner) {
-          user.owner = user.id;
+          user.owner = userReq.owner;
         } else if (user.role == UserRole.Manager || user.role == UserRole.Staff) {
           // admin create manager or staff -> must select manager
           let checkrole = CheckRoleStaffCreateUser(createUserDto, StaffRole.Account);
           if (checkrole) {
-            user.owner = user.id;
+            user.owner = userReq.owner;
           } else {
             if (!user.manager) {
               throw new BadRequestException('MissingManager')
@@ -130,9 +130,9 @@ export class UsersService {
             const manager = await this.findOne(user.manager, { throwIfFail: true });
             // set owner of new user to owner of the selected manager
             if (manager.role == UserRole.Owner) {
-              user.owner = manager._id;
+              user.owner = userReq.owner;
             } else {
-              user.owner = manager.owner;
+              user.owner = userReq.owner;
             }
           }
         }
