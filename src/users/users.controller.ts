@@ -11,7 +11,7 @@ import { ApiBody, ApiConsumes, ApiExcludeEndpoint, ApiParam, ApiQuery, ApiTags }
 import { UserChangePassword } from './dto/userChangePass.dto';
 import { OkRespone } from 'src/commons/OkResponse';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { multerFileFilter, } from 'src/configs/multer.cnf';
+import { multerFileFilter, multerStorage, } from 'src/configs/multer.cnf';
 import { JwtUser } from 'src/auth/inteface/jwtUser';
 import { AuthUser } from 'src/decors/user.decorator';
 import { Roles } from 'src/decors/roles.decorator';
@@ -166,6 +166,7 @@ export class UsersController {
   @Post(':id/avatar')
   @UseInterceptors(FileInterceptor('file', {
     fileFilter: multerFileFilter(['png', 'jpg', 'jpeg', 'webp']),
+    storage: multerStorage('users')
   }))
   async uploadAvatar(@Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
@@ -184,7 +185,7 @@ export class UsersController {
     @AuthUser() authUser: JwtUser
   ) {
     const url = await this.usersService.getAvatarSignedUrl(owner, filename, authUser);
-    return res.redirect(url);
+    return res.sendFile(url);
   }
 
   @Post('role')

@@ -16,12 +16,12 @@ import { OkRespone } from 'src/commons/OkResponse';
 import { Response } from 'express';
 import { FileBodyDto, FileFieldNameDto } from 'src/commons/dto/file-upload.dto';
 import { ApiBody, ApiConsumes, ApiExcludeEndpoint } from '@nestjs/swagger';
-import { multerFileFilter } from 'src/configs/multer.cnf';
+import { multerFileFilter, multerStorage } from 'src/configs/multer.cnf';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { AllowPublic } from 'src/decors/allow-public.decorator';
 
 @ApiTags('Notifications')
-@Controller('Notifications')
+@Controller('notifications')
 @BearerJwt()
 export class NotificationsController {
   constructor(private readonly notificationService: NotificationsService) { }
@@ -106,6 +106,7 @@ export class NotificationsController {
     { name: 'name', maxCount: 1 },
   ], {
     fileFilter: multerFileFilter(['png', 'jpg', 'jpeg', 'mp4']),
+    storage: multerStorage('notifications')
   }))
   async uploadImage(@Param('id') id: string,
     @UploadedFiles() files: { file?: Express.Multer.File[] },
@@ -130,6 +131,7 @@ export class NotificationsController {
      { name: 'name', maxCount: 1 },
    ], {
      fileFilter: multerFileFilter(['doc', 'docx', 'xls', 'xlsx', 'pps', 'ppsx', 'txt', 'pdf']),
+     storage: multerStorage('notifications')
    }))
    async uploadDocuments(@Param('id') id: string,
      @UploadedFiles() files: { file?: Express.Multer.File[] },
@@ -174,7 +176,7 @@ export class NotificationsController {
     @Param('type') type: string,
   ) {
     const url = await this.notificationService.getSignedUrl(productId, owner, type, filename);
-    return res.redirect(url);
+    return res.sendFile(url);
   }
 }
     

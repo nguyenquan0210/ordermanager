@@ -12,7 +12,7 @@ import {
 import { AuthUser } from 'src/decors/user.decorator';
 import { JwtUser } from 'src/auth/inteface/jwtUser';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { multerFileFilter } from 'src/configs/multer.cnf';
+import { multerFileFilter, multerStorage } from 'src/configs/multer.cnf';
 import { OkRespone } from 'src/commons/OkResponse';
 import { BearerJwt } from 'src/decors/bearer-jwt.decorator';
 import { ProductAttributeDto } from './dto/update-attr.dto';
@@ -134,6 +134,7 @@ export class ProductsController {
     { name: 'description', maxCount: 1 },
   ], {
     fileFilter: multerFileFilter(['png', 'jpg', 'jpeg']),
+    storage: multerStorage('products')
   }))
   async uploadImage(@Param('id') id: string,
     @UploadedFiles() files: { file?: Express.Multer.File[] },
@@ -159,6 +160,7 @@ export class ProductsController {
      { name: 'name', maxCount: 1 },
    ], {
      fileFilter: multerFileFilter(['mp4','flv','avi', 'mkv', 'wmv', 'vob', 'mov']),
+     storage: multerStorage('products')
    }))
    async uploadVideo(@Param('id') id: string,
      @UploadedFiles() files: { file?: Express.Multer.File[] },
@@ -183,6 +185,7 @@ export class ProductsController {
     { name: 'name', maxCount: 1 },
   ], {
     fileFilter: multerFileFilter(null),
+    storage: multerStorage('products')
   }))
   async uploadFile(@Param('id') id: string,
     @UploadedFiles() files: { file?: Express.Multer.File[] },
@@ -206,6 +209,7 @@ export class ProductsController {
     { name: 'name', maxCount: 1 },
   ], {
     fileFilter: multerFileFilter(null),
+    storage: multerStorage('products')
   }))
   async uploads(@Param('id') id: string,
     @UploadedFiles() files: { file?: Express.Multer.File[] },
@@ -270,7 +274,7 @@ export class ProductsController {
     @Param('type') type: string,
   ) {
     const url = await this.productsService.getSignedUrl(productId, owner, type, filename);
-    return res.redirect(url);
+    return res.sendFile(url);
   }
 
   @Get(':id/relateCustomers')

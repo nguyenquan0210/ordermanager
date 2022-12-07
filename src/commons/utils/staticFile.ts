@@ -1,7 +1,7 @@
 import path from "path";
 import fs from 'fs';
 import { promisify } from "util";
-import { PUBLIC_PATH } from "../constants/pathConstanst";
+import { PUBLIC_PATH, UPLOAD_PATH } from "../constants/pathConstanst";
 
 export class StaticFile {
     public static baseRoute: string = '/static';
@@ -43,5 +43,18 @@ export class StaticFile {
                 });
             }
         }
+    }
+
+    public static getFileName(url: string) {
+        let extract = url.split('/');
+        const filename = extract[extract.length-1];
+        return filename
+    }
+
+    public static getLocalFileUpload(pathFile: string, filename: string) {
+        const url = path.join(__dirname, '../../../..', PUBLIC_PATH, UPLOAD_PATH, pathFile, filename);
+        console.log(url);
+        
+        return url;
     }
 }

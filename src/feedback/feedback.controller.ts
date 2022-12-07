@@ -13,7 +13,7 @@ import { Request, Response } from 'express';
 import { SortOrder } from 'src/commons/dto/sorting';
 import { OkRespone } from 'src/commons/OkResponse';
 import { FileFieldNameDto } from 'src/commons/dto/file-upload.dto';
-import { multerFileFilter } from 'src/configs/multer.cnf';
+import { multerFileFilter, multerStorage } from 'src/configs/multer.cnf';
 import { FeedbackStatus } from './interface/feedbackstatus';
 import { FeedbacksService } from './feedback.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
@@ -86,6 +86,7 @@ export class FeedbacksController {
         { name: 'description', maxCount: 1 },
     ], {
         fileFilter: multerFileFilter(['png', 'jpg', 'jpeg']),
+        storage: multerStorage('feedbacks')
     }))
     async uploadImage(@Param('id') id: string,
         @UploadedFiles() files: { file?: Express.Multer.File[] },
@@ -107,7 +108,7 @@ export class FeedbacksController {
         @Param('filename') filename: string
     ) {
         const url = await this.FeedbackService.getSignedUrl(feedbackId, owner, filename);
-        return res.redirect(url);
+        return res.sendFile(url);
     }
 
 

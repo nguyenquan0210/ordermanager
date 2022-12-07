@@ -8,7 +8,7 @@ import { ApiBody, ApiConsumes, ApiExcludeEndpoint, ApiParam, ApiQuery, ApiTags }
 import { JwtUser } from 'src/auth/inteface/jwtUser';
 import { FileUploadDto } from 'src/commons/dto/file-upload.dto';
 import { OkRespone } from 'src/commons/OkResponse';
-import { multerFileFilter } from 'src/configs/multer.cnf';
+import { multerFileFilter, multerStorage } from 'src/configs/multer.cnf';
 import { BearerJwt } from 'src/decors/bearer-jwt.decorator';
 import { AuthUser } from 'src/decors/user.decorator';
 import { CustomerService } from './customer.service';
@@ -107,9 +107,15 @@ export class CustomerController {
     type: FileUploadDto,
   })
   @Post(':id/avatar')
-  @UseInterceptors(FileInterceptor('file', {
-    fileFilter: multerFileFilter(['png', 'jpg']),
-  }))
+  @UseInterceptors(
+    FileInterceptor('file', 
+      {
+        fileFilter: multerFileFilter(['png', 'jpg', 'jpeg', 'webp']),
+        // uploadFile on server
+        storage: multerStorage('customers')
+      }
+    )
+  )
   async uploadAvatar(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
@@ -124,11 +130,10 @@ export class CustomerController {
   @AllowPublic()
   async getAvatar(
     @Res() res: Response,
-    @Param('id') id: string,
     @Param('filename') filename: string,
   ) {
-    const url = await this.customerService.getAvatarSignedUrl(id, filename);
-    return res.redirect(url);
+    const url = await this.customerService.getAvatarSignedUrl(filename);
+    return res.sendFile(url);
   }
 
   // @ApiExcludeEndpoint()

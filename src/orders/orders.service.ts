@@ -37,7 +37,9 @@ import { Customer, CustomerDocument } from 'src/customers/entities/customer.enti
 import { UpdateDoneOrderDto } from './dto/update-done-order.dto';
 import { UpdateCancelOrderDto } from './dto/update-cancel-order.dto';
 import { RequestConfirmationOrderDto } from './dto/request-confirmation-order.dto';
-import { deleteFile, signedUrl } from 'src/commons/utils/s3Client';
+import { deleteFile, signedUrl, uploadFile } from 'src/commons/utils/s3Client';
+import { fs } from 'file-system';
+import { StaticFile } from 'src/commons/utils/staticFile';
 
 @Injectable()
 export class OrdersService {
@@ -1540,14 +1542,9 @@ export class OrdersService {
       .orFail(new NotFoundException(ErrCode.E_COMMENT_NOT_FOUND))
       .exec();
 
-    const random = nanoid(16);
-    const url = `order/checkoutphoto/${id}/${random}.png`
-    // const output = await uploadFile({
-    //   file: file,
-    //   filePath: url,
-    //   mimetype: file.mimetype
-    // })
-
+    const url = `order/checkoutphoto/${id}/${file.filename}`
+  
+    var img = fs.readFileSync(url);
     if (resume.checkoutPhoto) {
       deleteFile(resume.checkoutPhoto);
     }
@@ -1557,9 +1554,8 @@ export class OrdersService {
   }
 
   async getCheckoutPhotoSignedUrl(id: string, fileName: string, authResume?: JwtUser) {
-    const fileKey = `resumes/checkoutphoto/${id}/${fileName}`;
-    const url = await signedUrl(fileKey);
-    return url;
+    const key = StaticFile.getLocalFileUpload('orders', fileName);
+        return key;
   }
   
 }
