@@ -13,6 +13,7 @@ import { FeedbackStatus } from './interface/feedbackstatus';
 import { QueryFeedback } from './dto/query-feedback.dto';
 import { UserRole } from 'src/users/interface/userRoles';
 import { CHECK_SIZE_FILE } from 'src/commons/constants/envConstanst';
+import { StaticFile } from 'src/commons/utils/staticFile';
 
 @Injectable()
 export class FeedbacksService {
@@ -102,14 +103,21 @@ export class FeedbacksService {
             .orFail(new NotFoundException(ErrCode.E_FEEDBACK_NOT_FOUND))
             .exec();
 
-        const random = nanoid(24);
-        const url = `feedbacks/${userReq.owner ?? 'default'}/${feedback._id}/images/${random}.png`;
+      
+        const url = `feedbacks/${userReq.owner ?? 'default'}/${feedback._id}/images/${file.filename}`;
         // move file to proper path
-        await uploadFile({
-            file: file,
-            filePath: url,
-            mimetype: file.mimetype
-        })
+        // await uploadFile({
+        //     file: file,
+        //     filePath: url,
+        //     mimetype: file.mimetype
+        // })
+        // uploadFile server
+       
+        //const filename = StaticFile.getFileName(doc.image);
+            // delete file server
+            // const url = StaticFile.getLocalFileUpload('menus', filename);
+            // StaticFile.deleteStaticFile(url);
+ 
 
         feedback.imageList.push({
             name: filename || file.originalname,
@@ -123,8 +131,8 @@ export class FeedbacksService {
     }
 
     getSignedUrl(id: string, owner: string, fileName: string) {
-        const key = `feedback/${owner}/${id}/${fileName}`;
-        return signedUrl(key);
+        const key = StaticFile.getLocalFileUpload('feedbacks', fileName);
+        return key;
     }
 }
 

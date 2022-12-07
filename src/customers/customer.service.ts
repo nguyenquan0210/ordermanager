@@ -36,6 +36,7 @@ import { CustomerRelateCustomerService } from './customer-relate-customer/custom
 import { UsersService } from 'src/users/users.service';
 import { ResourcesService } from 'src/resources/resources.service';
 import { ResourceType } from 'src/resources/inteface/resourceType';
+import { StaticFile } from 'src/commons/utils/staticFile';
 
 @Injectable()
 export class CustomerService {
@@ -386,16 +387,17 @@ export class CustomerService {
       before: doc.toJSON(),
       updatedBy: authUser.userId,
     };
-    const avatar = await this.resourcesService.createAndUploadFile(file, authUser, ResourceType.Image, 'avatar customer');
-    // const random = nanoid(16);
-    // const url = `customers/avatars/${authUser.owner ?? 'default'}/${random}.png`;
-    // await uploadFile({
-    //   file: file,
-    //   filePath: url,
-    //   mimetype: file.mimetype
-    // });
-    
-    doc.avatar = avatar.url;
+
+     // uploadFile server
+     const url = `customers/avatars/${id}/${file.filename}`;
+     if (doc.avatar) {
+       const filename = StaticFile.getFileName(doc.avatar);
+         // delete file server
+         const url = StaticFile.getLocalFileUpload('customers', filename);
+         StaticFile.deleteStaticFile(url);
+     }
+
+    doc.avatar = url;
     const result = await doc.save();
 
     const change = _.omit(difference(result.toJSON(), history.before), ['updatedAt']);
@@ -404,10 +406,15 @@ export class CustomerService {
     return result;
   }
 
-  async getAvatarSignedUrl(id: string, fileName: string) {
-    const fileKey = `customers/avatars/${id}/${fileName}`;
-    const url = await signedUrl(fileKey);
-    return url;
+  // async getAvatarSignedUrl(id: string, fileName: string) {
+  //   const fileKey = `customers/avatars/${id}/${fileName}`;
+  //   const url = await signedUrl(fileKey);
+  //   return url;
+  // }
+  async getAvatarSignedUrl(fileName: string) {
+    // get file server
+    const key = StaticFile.getLocalFileUpload('customers', fileName);
+    return key;
   }
 
   private async validateAttributes(attr: CustomerAttribute) {

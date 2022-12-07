@@ -24,6 +24,7 @@ import { CronJob } from 'cron';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { ResourcesService } from 'src/resources/resources.service';
 import { ResourceType } from 'src/resources/inteface/resourceType';
+import { StaticFile } from 'src/commons/utils/staticFile';
 @Injectable()
 export class NotificationsService {
   /**
@@ -357,10 +358,13 @@ export class NotificationsService {
       .byTenant(userReq.owner)
       .orFail(new NotFoundException(ErrCode.E_SPEAKER_NOT_FOUND))
       .exec();
-
-    let attachment = await this.resourcesService.createAndUploadFile(file, userReq, ResourceType.Image, 'image notification', filename);
+   
+    const url = `notifications/${userReq.owner}/${id}/images/${file.filename}`;
     noti.imageVideoList.push({
-      ...attachment 
+      name: filename || file.originalname,
+      url: url,
+      mimetype: file.mimetype,
+      size: file.size
     });
 
     const result = await noti.save();
@@ -373,10 +377,15 @@ export class NotificationsService {
       .byTenant(userReq.owner)
       .orFail(new NotFoundException(ErrCode.E_SPEAKER_NOT_FOUND))
       .exec();
-    const document = await this.resourcesService.createAndUploadFile(file, userReq, ResourceType.File, 'file notification', filename);   
-    speaker.documentList.push({
-      ...document
-    });
+          
+      const url = `notifications/${userReq.owner}/${id}/file/${file.filename}`;
+    
+      speaker.documentList.push({
+        name: filename || file.originalname,
+        url: url,
+        mimetype: file.mimetype,
+        size: file.size
+      });
 
     const result = await speaker.save();
     return result;
@@ -416,8 +425,8 @@ export class NotificationsService {
   }
 
   getSignedUrl(id: string, owner: string, type: string, fileName: string) {
-    const key = `Notifications/${owner}/${id}/${type}/${fileName}`;
-    return signedUrl(key);
+    const key = StaticFile.getLocalFileUpload('notifications', fileName);
+    return key;
   }
 
   private async remindNoti() {

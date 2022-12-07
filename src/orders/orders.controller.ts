@@ -5,7 +5,7 @@ import {
   import { ApiBody, ApiConsumes, ApiExcludeEndpoint, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
   import { OkRespone } from 'src/commons/OkResponse';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { multerFileFilter, } from 'src/configs/multer.cnf';
+import { multerFileFilter, multerStorage, } from 'src/configs/multer.cnf';
   import { OrdersService } from './orders.service';
   import { CreateOrderDto } from './dto/create-order.dto';
   import { UpdateOrderDto } from './dto/update-order.dto';
@@ -128,6 +128,7 @@ import { AllowPublic } from 'src/decors/allow-public.decorator';
    @Post(':id/checkout-photo')
    @UseInterceptors(FileInterceptor('file', {
      fileFilter: multerFileFilter(['png', 'jpg', 'jpeg', 'webp']),
+     storage: multerStorage('orders')
    }))
    async uploadCheckoutPhoto(@Param('id') id: string,
      @UploadedFile() file: Express.Multer.File,

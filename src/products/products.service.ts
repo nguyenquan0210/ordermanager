@@ -40,6 +40,7 @@ import { ResourcesService } from 'src/resources/resources.service';
 import { ResourceType } from 'src/resources/inteface/resourceType';
 import { RelateDepartmentService } from './product-department/relate-department.service';
 import { CreateRelateArrDepartmentDto } from './product-department/dto/create-product-rle-arrDepartment.dto';
+import { StaticFile } from 'src/commons/utils/staticFile';
 
 @Injectable()
 export class ProductsService {
@@ -455,11 +456,15 @@ export class ProductsService {
       updatedBy: userReq.userId,
       status: StatusHistory.create
     }
-    const image = this.resourcesService.createAndUploadFile(file, userReq, ResourceType.Image, 'image product', filename);
+   
+    const url = `products/${userReq.owner}/${id}/${ResourceType.Image}/${file.filename}`;
 
     product.imageList.push({
       description: description,
-      ...image
+      name: filename || file.originalname,
+      url: url,
+      mimetype: file.mimetype,
+      size: file.size
     });
 
     const result = await product.save();
@@ -476,16 +481,20 @@ export class ProductsService {
       .byTenant(userReq.owner)
       .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
       .exec();
-    const video = await this.resourcesService.createAndUploadFile(file, userReq, ResourceType.Video, 'video product', filename)
+    //const video = await this.resourcesService.createAndUploadFile(file, userReq, ResourceType.Video, 'video product', filename)
     const history = {
       product: product._id,
       before: product.toJSON(),
       updatedBy: userReq.userId,
       status: StatusHistory.create
     }
+    const url = `products/${userReq.owner}/${id}/${ResourceType.Video}/${file.filename}`;
 
     product.videoList.push({
-      ...video
+      name: filename || file.originalname,
+      url: url,
+      mimetype: file.mimetype,
+      size: file.size
     });
 
     const result = await product.save();
@@ -512,10 +521,14 @@ export class ProductsService {
       updatedBy: userReq.userId,
       status: StatusHistory.create
     }
-    const files = await this.resourcesService.createAndUploadFile(file, userReq, ResourceType.File, 'file product', filename)
+    //const files = await this.resourcesService.createAndUploadFile(file, userReq, ResourceType.File, 'file product', filename)
+    const url = `products/${userReq.owner}/${id}/${ResourceType.File}/${file.filename}`;
 
     product.fileList.push({
-      ...files
+      name: filename || file.originalname,
+      url: url,
+      mimetype: file.mimetype,
+      size: file.size
     });
 
     const result = await product.save();
@@ -543,10 +556,14 @@ export class ProductsService {
     }
     const types = this.getFileType(file.mimetype);
 
-    const allFile = await this.resourcesService.createAndUploadFile(file, userReq, ResourceType[types],  `${types} product`, filename)
+    //const allFile = await this.resourcesService.createAndUploadFile(file, userReq, ResourceType[types],  `${types} product`, filename)
+    const url = `products/${userReq.owner}/${id}/${ResourceType[types]}/${file.filename}`;
 
     const fileInfo = {
-      ...allFile,
+      name: filename || file.originalname,
+      url: url,
+      mimetype: file.mimetype,
+      size: file.size
     };
 
     if (types == 'Image')
@@ -653,8 +670,8 @@ export class ProductsService {
   }
 
   getSignedUrl(id: string, owner: string, type: string, fileName: string) {
-    const key = `products/${owner}/${id}/${type}/${fileName}`;
-    return signedUrl(key);
+    const key = StaticFile.getLocalFileUpload('products', fileName);
+    return key;
   }
 
   //#region Attributes

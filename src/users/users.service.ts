@@ -33,6 +33,7 @@ import { ChangeLanguageDto } from './dto/change-language.dto';
 import { ResourcesService } from 'src/resources/resources.service';
 import { ResourceType } from 'src/resources/inteface/resourceType';
 import { ChangeCommissionDto } from './dto/change-commission.dto';
+import { StaticFile } from 'src/commons/utils/staticFile';
 //import { PackkagesService } from 'src/packkages/packkage.service';
 
 
@@ -537,24 +538,20 @@ export class UsersService {
       .orFail(new NotFoundException(ErrCode.E_USER_NOT_FOUND))
       .exec();
 
-    const avatar = await this.resourcesService.createAndUploadFile(file, authUser, ResourceType.Image, 'avatar user');
-    // const random = nanoid(16);
-    // const url = `users/avatars/${authUser.owner ?? 'default'}/${random}.png`
-    // const output = await uploadFile({
-    //   file: file,
-    //   filePath: url,
-    //   mimetype: file.mimetype
-    // })
-  
-    // user.avatar = filePath;
-    user.avatar = avatar.url;
+      const url = `users/avatars/${id}/${file.filename}`;
+      if (user.avatar) {
+          const filename = StaticFile.getFileName(user.avatar);
+          // delete file server
+          const url = StaticFile.getLocalFileUpload('users', filename);
+          StaticFile.deleteStaticFile(url);
+      }
+    user.avatar = url;
     return await user.save();
   }
 
   async getAvatarSignedUrl(id: string, fileName: string, authUser?: JwtUser) {
-    const fileKey = `users/avatars/${id}/${fileName}`;
-    const url = await signedUrl(fileKey);
-    return url;
+    const key = StaticFile.getLocalFileUpload('users', fileName);
+    return key;
   }
 
   async changeRole(info: ChangeRoleDto, authUser: JwtUser) {

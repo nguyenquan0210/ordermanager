@@ -18,7 +18,7 @@ import { UpdateS3FileDto } from './dto/update-s3file.dto';
 import { Resource, ResourceDocument } from './entities/resource.entity';
 import { ResourceType } from './inteface/resourceType';
 import { LevelAccount } from 'src/users/interface/userRoles';
-
+import { fs } from 'file-system';
 @Injectable()
 export class ResourcesService {
   constructor(
@@ -193,13 +193,21 @@ export class ResourcesService {
     const ext = getExtension(file.originalname);
     const random = nanoid(24) + `${ext ? `.${ext}` : ''}`;
     const url = `resources/${userReq.owner ?? 'default'}/${doc.type}/${doc._id}/${random}`;
-
+    console.log(file)
     // move file to proper path
-    await uploadFile({
-      file: file,
-      filePath: url,
-      mimetype: file.mimetype
-    })
+    // await uploadFile({
+    //   file: file,
+    //   filePath: url,
+    //   mimetype: file.mimetype
+    // })
+    var img = fs.readFileSync(file.path);
+    console.log(img)
+    var encode_image = img.toString('base64');
+    console.log(encode_image)
+  //   var finalImg = {
+  //     contentType: file.mimetype,
+  //     image: Buffer.from(encode_image, 'base64')
+  // };
     if (!doc.files) { doc.files = []; }
 
     const result = {
