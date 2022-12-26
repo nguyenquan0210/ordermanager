@@ -6,7 +6,7 @@ import { Product, ProductSchema } from './entities/product.entity';
 import { AttributesModule } from 'src/attributes/attributes.module';
 import { ProductCategorySchema } from 'src/product-categories/entities/product-category.entity';
 import {
-  PRODUCT_CTG, PRODUCT_STATUS, PRODUCT_LABEL, PRODUCT_HISTORY, PRODUCT_RELATE_CUSTOMER, PRODUCT_RELATE_TODO, PRODUCT_RELATE_DEPARTMENT
+  PRODUCT_CTG, PRODUCT_STATUS, PRODUCT_LABEL, PRODUCT_HISTORY, PRODUCT_RELATE_CUSTOMER, PRODUCT_RELATE_TODO, PRODUCT_RELATE_DEPARTMENT, PRODUCT_COLOR, PRODUCT_RELATE_COLOR
 } from 'src/commons/constants/schemaConst';
 import { ProductStatusSchema } from 'src/product-status/entities/product-status.entity';
 import { LabelSchema } from 'src/labels/entities/label.entity';
@@ -32,6 +32,10 @@ import { ResourcesModule } from 'src/resources/resources.module';
 import { ProductRelateDepartmentSchema } from './entities/product-ralate-department.entity';
 import { RelateDepartmentService } from './product-department/relate-department.service';
 import { ClientsController } from './product-client.controller';
+import { ProductColorsService } from './products-color/products-color.service';
+import { ColorsController } from './products-color.controller';
+import { RelateColorService } from './products-ralate-color/relate-color.service';
+import { ProductRelateColorsSchema } from './entities/products-ralate-color.entity';
 
 @Module({
   imports: [
@@ -42,9 +46,11 @@ import { ClientsController } from './product-client.controller';
       { name: PRODUCT_CTG, useFactory: () => ProductCategorySchema },
       { name: PRODUCT_STATUS, useFactory: () => ProductStatusSchema },
       { name: PRODUCT_LABEL, useFactory: () => LabelSchema },
+      { name: PRODUCT_COLOR, useFactory: () => LabelSchema },
       { name: PRODUCT_RELATE_CUSTOMER, useFactory: () => ProductRelateCustomerSchema },
       { name: PRODUCT_RELATE_TODO, useFactory: () => ProductRelateTodoCustomerSchema },
       { name: PRODUCT_RELATE_DEPARTMENT, useFactory: () => ProductRelateDepartmentSchema},
+      { name: PRODUCT_RELATE_COLOR, useFactory: () => ProductRelateColorsSchema},
       { name: Notifications.name, useFactory: () => NotificationsSchema },
       { name: ORDER_PRODUCT, useFactory: () => OrderProductSchema },      
       {
@@ -61,16 +67,19 @@ import { ClientsController } from './product-client.controller';
   controllers: [
     HistoriesController,
     LabelsController,
+    ColorsController,
     RelateCustomerController,
     ProductsController,
     ClientsController],
   providers: [
-    ProductsService, 
-    ProductLabelService, 
-    HistoriesService, 
-    RelateCustomerService, 
-    RelateTodoService, 
-    RelateDepartmentService, 
-    ]
+    ProductsService,
+    ProductLabelService,
+    ProductColorsService,
+    HistoriesService,
+    RelateCustomerService,
+    RelateTodoService,
+    RelateDepartmentService,
+    RelateColorService,
+  ]
 })
 export class ProductsModule { }

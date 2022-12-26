@@ -30,7 +30,7 @@ export class TodoDemandService {
     // CheckRoleStaff(authUser, StaffRole.Demand);
     let todo = new this.todoDemandDoc(createTodoDemandDto)
       .withTenant(authUser.owner)
-    todo.createdBy = authUser == null ? "" : authUser.userId;
+    todo.createdBy = authUser?.userId;
     return todo.save();
   }
 
@@ -143,9 +143,9 @@ export class TodoDemandService {
       .orFail(new NotFoundException(ErrCode.E_TODO_DEMAND_NOT_FOUND))
       .exec();
 
-      if(authUser.role == UserRole.Staff && authUser.userId != doc.createdBy){
-      throw new ForbiddenException();
-    }
+      if(authUser.role == UserRole.Staff && authUser.userId != doc?.createdBy){
+        throw new ForbiddenException();
+      }
     const result = await doc.set(updateTodoDemandDto).save();
     return result;
   }
