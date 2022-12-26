@@ -22,6 +22,7 @@ import { Request as ExRequest } from 'express';
 import { ArrayObjectIdValidationPipe } from 'src/commons/pipes/array-object-id-validation.pipe';
 import { SortOrder } from 'src/commons/dto/sorting';
 import { CreateRelateArrDepartmentDto } from './product-department/dto/create-product-rle-arrDepartment.dto';
+import { CreateRelateArrColorDto } from './products-ralate-color/dto/create-product-rle-arr-color.dto';
 
 @ApiTags('Product')
 @Controller('products')
@@ -36,6 +37,7 @@ export class ProductsController {
   }
 
   @Get()
+  @AllowPublic()
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'offset', required: false, type: Number })
   @ApiQuery({ name: 'search', required: false, type: String })
@@ -53,7 +55,7 @@ export class ProductsController {
     example: "",
     description: "Filter by label id. It can have many labels in 1 request"
   })
-  findAll(@AuthUser() userReq: JwtUser,
+  findAll(@AuthUser() userReq?: JwtUser,
     @Request() req?: ExRequest,
     @Query('limit', new DefaultValuePipe('0'), ParseIntPipe) limit?: number,
     @Query('offset', new DefaultValuePipe('0'), ParseIntPipe) offset?: number,
@@ -395,30 +397,56 @@ export class ProductsController {
   }
   //#endregion
 
+  // //#region relate Departments
+  // @Post(':id/departments')
+  // async addRelateDepartments(@Param('id') id: string,
+  // @Body() createRelateArrDepartmentDto: CreateRelateArrDepartmentDto,
+  //   @AuthUser() authUser: JwtUser) {
+  //   const result = await this.productsService.addRelateDepartments(id, createRelateArrDepartmentDto, authUser);
+  //   return new OkRespone({ data: result });
+  // }
+
+  // @Put(':id/departments')
+  // async updateRelateDepartments(@Param('id') id: string,
+  //   @Body() createRelateArrDepartmentDto: CreateRelateArrDepartmentDto,
+  //   @AuthUser() authUser: JwtUser) {
+  //   const result = await this.productsService.updateRelateDepartments(id, createRelateArrDepartmentDto, authUser);
+  //   return new OkRespone({ data: result });
+  // }
+
+  // @Delete(':id/departments')
+  // async removeRelateDepartments(@Param('id') id: string,
+  //   @Body(ArrayObjectIdValidationPipe) todoIds: string[],
+  //   @AuthUser() authUser: JwtUser) {
+  //   const result = await this.productsService.removeRelateDepartments(id, todoIds, authUser);
+  //   return new OkRespone({ data: result });
+  // }
+  // //#endregion
+  
   //#region relate Departments
-  @Post(':id/departments')
+  @Post(':id/relate-colors')
   async addRelateDepartments(@Param('id') id: string,
-  @Body() createRelateArrDepartmentDto: CreateRelateArrDepartmentDto,
+  @Body() createRelateArrColorDto: CreateRelateArrColorDto,
     @AuthUser() authUser: JwtUser) {
-    const result = await this.productsService.addRelateDepartments(id, createRelateArrDepartmentDto, authUser);
+    const result = await this.productsService.addRelateColors(id, createRelateArrColorDto, authUser);
     return new OkRespone({ data: result });
   }
 
-  @Put(':id/departments')
+  @Put(':id/relate-colors')
   async updateRelateDepartments(@Param('id') id: string,
-    @Body() createRelateArrDepartmentDto: CreateRelateArrDepartmentDto,
+    @Body() createRelateArrColorDto: CreateRelateArrColorDto,
     @AuthUser() authUser: JwtUser) {
-    const result = await this.productsService.updateRelateDepartments(id, createRelateArrDepartmentDto, authUser);
+    const result = await this.productsService.updateRelateColors(id, createRelateArrColorDto, authUser);
     return new OkRespone({ data: result });
   }
 
-  @Delete(':id/departments')
-  async removeRelateDepartments(@Param('id') id: string,
-    @Body(ArrayObjectIdValidationPipe) todoIds: string[],
-    @AuthUser() authUser: JwtUser) {
-    const result = await this.productsService.removeRelateDepartments(id, todoIds, authUser);
-    return new OkRespone({ data: result });
-  }
+  // @Delete(':id/relate-colors')
+  // async removeRelateDepartments(@Param('id') id: string,
+  //   @Body(ArrayObjectIdValidationPipe) todoIds: string[],
+  //   @AuthUser() authUser: JwtUser) {
+  //   const result = await this.productsService.removeRelateColors(id, todoIds, authUser);
+  //   return new OkRespone({ data: result });
+  // }
   //#endregion
 
   //#region relate owner
