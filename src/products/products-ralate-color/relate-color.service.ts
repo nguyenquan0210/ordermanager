@@ -133,50 +133,26 @@ export class RelateColorService {
     async addRelateColor(doc: ProductDocument, createRelateArrProductDto: CreateRelateArrColorDto , authUser: JwtUser) {
         let result = [];
         if (createRelateArrProductDto.colors) {
-            createRelateArrProductDto.colors.forEach(async element => {
+            
+            for (const key in createRelateArrProductDto.colors) {
                 var dto = new CreateProductRelateColorDto();
                 dto.product = doc._id;
-                dto.color = element.color;
-                //let productColor = await this.model.findOne({ color: authUser?.Color, product: doc._id }).lean().exec();
+                dto.color = createRelateArrProductDto.colors[key].color;
                 const exists = await this.model.findOne(dto).lean().exec();
-                // if(authUser?.Color && doc._id != authUser?.Color && productColor?.quantity > 0 && !createRelateArrProductDto.wareHouse){
-                //     if (!exists) {
-                //         if (productColor?.quantity > element.quantity) {
-                //             dto.quantity += element.quantity;
-                //             productColor.quantity -= element.quantity
-                //         } else {
-                //             dto.quantity = productColor?.quantity;
-                //             productColor.quantity = 0
-                //         }
-                //         const relateColor = await new this.model(dto)
-                //         result.push(relateColor);
-                //         relateColor.save()
-                //     } else {
-                //         if (productColor.quantity > element.quantity) {
-                //             exists.quantity += element.quantity;
-                //             productColor.quantity -= element.quantity
-                //         } else {
-                //             exists.quantity = productColor.quantity;
-                //             productColor.quantity = 0
-                //         }
-                //         await this.model.findByIdAndUpdate(exists._id, exists).exec()
-                //         result.push(exists);
-                //     }
-                //     await this.model.findByIdAndUpdate(productColor._id, productColor).exec();
-                // }
+                
                 if (!exists) {
-                    dto.quantity += element.quantity;
+                    dto.quantity = createRelateArrProductDto.colors[key].quantity;
+                    dto.money = createRelateArrProductDto.colors[key].money;
                     const relateColor = await new this.model(dto)
                     result.push(relateColor);
                     relateColor.save()
                 } else {
                     
-                    exists.quantity += element.quantity;
+                    exists.quantity += createRelateArrProductDto.colors[key].quantity;
                     await this.model.findByIdAndUpdate(exists._id, exists).exec()
-                    //await exists.save()
                     result.push(exists);
                 }
-            });
+            }
         }
         return result;
     }

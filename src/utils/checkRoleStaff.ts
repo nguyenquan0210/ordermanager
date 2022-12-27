@@ -12,9 +12,9 @@ export const CheckRoleStaff = (userReq: JwtUser, staffRole: StaffRole) => {
         }
         throw new ForbiddenException();
     }
-    if(userReq.role == UserRole.Customer){
-        throw new ForbiddenException();
-    }
+    // if(userReq.role == UserRole.Customer){
+    //     throw new ForbiddenException();
+    // }
     return true;
 }
 export const CheckRoleStaffCreateUser = (user: CreateUserDto, staffRole: StaffRole) => {

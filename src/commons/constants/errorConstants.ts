@@ -24,6 +24,8 @@ export const ErrCode = {
     E_PRODUCT_CODE_EXISTED: 'ProductCodeExisted',
     E_PRODUCT_IN_ORDER_NOT_DONE: 'ProductInOrderNotDone',
 
+    E_SUPPLIER_NOT_FOUND: 'NotFoundSupplier',
+
     E_UPLOAD_FILE: 'FileIsTooBig',
     E_OUT_OF_MEMORY: 'OutOfMemory',
 

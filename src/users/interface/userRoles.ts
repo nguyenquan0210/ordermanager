@@ -14,7 +14,6 @@ export enum StaffRole {
     Accountant = 'Accountant',
     AssignTodo = 'AssignTodo',
     Manager = 'Manager',
-
 }
 
 export const AllStaffRole = [

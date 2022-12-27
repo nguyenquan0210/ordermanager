@@ -18,7 +18,7 @@ import { UpdateS3FileDto } from './dto/update-s3file.dto';
 import { Resource, ResourceDocument } from './entities/resource.entity';
 import { ResourceType } from './inteface/resourceType';
 import { LevelAccount } from 'src/users/interface/userRoles';
-import { fs } from 'file-system';
+//import { fs } from 'file-system';
 @Injectable()
 export class ResourcesService {
   constructor(
@@ -200,10 +200,10 @@ export class ResourcesService {
     //   filePath: url,
     //   mimetype: file.mimetype
     // })
-    var img = fs.readFileSync(file.path);
-    console.log(img)
-    var encode_image = img.toString('base64');
-    console.log(encode_image)
+    // var img = fs.readFileSync(file.path);
+    // console.log(img)
+    // var encode_image = img.toString('base64');
+    // console.log(encode_image)
   //   var finalImg = {
   //     contentType: file.mimetype,
   //     image: Buffer.from(encode_image, 'base64')

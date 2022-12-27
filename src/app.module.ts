@@ -23,6 +23,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { FeedbacksModule } from './feedback/feedback.module';
 import { CommissionModule } from './commissions/commission.module';
 import { DepartmentsModule } from './departments/department.module';
+import { SuppliersModule } from './suppliers/suppliers.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { DepartmentsModule } from './departments/department.module';
     MongooseModule.forRoot(connectUrl, connectOptions),
     AuthModule,
     UsersModule,
+    SuppliersModule,
     DepartmentsModule,
     FeedbacksModule,
     ProductCategoriesModule,

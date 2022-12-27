@@ -56,23 +56,23 @@ export class StatisticsController {
     /**
   * Upload image
   */
-    @ApiConsumes('multipart/form-data')
-    @ApiBody({
-        description: 'Normal file.',
-        type: FileUploadDto,
-    })
-    @Post('testExcelToJson')
-    @UseInterceptors(FileFieldsInterceptor([
-        { name: 'file', maxCount: 1 },
-    ], {
-        fileFilter: multerFileFilter(null),
-    }))
-    //@Get('testExcelToJson')
-    @Roles(UserRole.Admin)
-    testExcelToJson(
-        @UploadedFiles() files: { file?: Express.Multer.File[] },
-    ) {
-        return this.usersService.testExcelToJson(files.file[0]);
-    }
+    // @ApiConsumes('multipart/form-data')
+    // @ApiBody({
+    //     description: 'Normal file.',
+    //     type: FileUploadDto,
+    // })
+    // @Post('testExcelToJson')
+    // @UseInterceptors(FileFieldsInterceptor([
+    //     { name: 'file', maxCount: 1 },
+    // ], {
+    //     fileFilter: multerFileFilter(null),
+    // }))
+    // //@Get('testExcelToJson')
+    // @Roles(UserRole.Admin)
+    // testExcelToJson(
+    //     @UploadedFiles() files: { file?: Express.Multer.File[] },
+    // ) {
+    //     return this.usersService.testExcelToJson(files.file[0]);
+    // }
 
 }
