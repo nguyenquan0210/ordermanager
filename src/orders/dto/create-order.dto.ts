@@ -31,8 +31,8 @@ export class CreateOrderDto {
     @IsOptional()
     carerStaffs: string[];
 
-    // @IsMongoId()
-    // customers: string;
+    @IsMongoId()
+    customers: string;
 
     // @IsArray()
     @ValidateNested({ each: true })

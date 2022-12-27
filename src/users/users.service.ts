@@ -5,7 +5,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
-import Excel from 'exceljs';
+// import Excel from 'exceljs';
 import path from "path";
 import { ErrCode } from '../commons/constants/errorConstants';
 import { UserChangePassword } from './dto/userChangePass.dto';
@@ -951,69 +951,69 @@ export class UsersService {
       total += totalCmd;
     }
 
-    const workbook = new Excel.Workbook();
-    const worksheet = workbook.addWorksheet('Countries List');
+    // const workbook = new Excel.Workbook();
+    // const worksheet = workbook.addWorksheet('Countries List');
     
-    worksheet.columns = [
-      { key: 'year', header: 'Năm' },
-      { key: 'totalyear', header: 'Tổng khách hàng trong năm' },
-      { key: 'month', header: 'Tháng' },
-      { key: 'total', header: 'Tổng khách hàng trong tháng' },
-    ];
-    worksheet.addRow({totalyear:total,year: year.getFullYear()});
-    data.forEach((item) => {
-      worksheet.addRow(item);
-    });
+    // worksheet.columns = [
+    //   { key: 'year', header: 'Năm' },
+    //   { key: 'totalyear', header: 'Tổng khách hàng trong năm' },
+    //   { key: 'month', header: 'Tháng' },
+    //   { key: 'total', header: 'Tổng khách hàng trong tháng' },
+    // ];
+    // worksheet.addRow({totalyear:total,year: year.getFullYear()});
+    // data.forEach((item) => {
+    //   worksheet.addRow(item);
+    // });
     
-    const exportPath = path.resolve(__dirname, 'data.xlsx');
+    // const exportPath = path.resolve(__dirname, 'data.xlsx');
 
-    await workbook.xlsx.writeFile(exportPath);
+    // await workbook.xlsx.writeFile(exportPath);
     return { total, year: year.getFullYear(), data };
   }
 
-  async testExcelToJson(file: Express.Multer.File,) {
-    const workbook = new Excel.Workbook();
-    const exportPath = path.resolve(__dirname, 'data.xlsx');
-    console.log(exportPath)
+  // async testExcelToJson(file: Express.Multer.File,) {
+  //   const workbook = new Excel.Workbook();
+  //   const exportPath = path.resolve(__dirname, 'data.xlsx');
+  //   console.log(exportPath)
 
-    await workbook.xlsx.readFile(exportPath);
-    //const workbookReader = new Excel.stream.xlsx.WorkbookReader(exportPath);
-    let jsonData = [];
-    workbook.worksheets.forEach(function(sheet) {
-        // read first row as data keys
-        let firstRow = sheet.getRow(16);
-        let d = 2;
-        // while(firstRow.values){
-        //   firstRow = sheet.getRow(d)
-        //   d++;
-        //   console.log(firstRow.values)
-        //   console.log(d)
-        // }
-         console.log(firstRow.cellCount)
-         console.log(firstRow.values)
-        if (!firstRow.cellCount) return;
-        let keys = firstRow.values;
-        sheet.eachRow((row, rowNumber) => {
-            if (rowNumber == 1) return;
-            let values = row.values
-            //console.log(rowNumber,values)
-            let obj = {};
-            for (let i = 1; i < keys.length; i ++) {
-              //console.log(i,values[i])
-                if(values[i] != undefined)
-                  obj[keys[i]] = values[i];
-            }
-            //console.log(obj)
-            if(obj?.['undefined'] !=0 && (typeof obj?.['Tổng khách hàng trong năm']) == typeof 1){
-              //console.log(obj?.['Tổng khách hàng trong năm'])
-              jsonData.push(obj);
-            }
-        })
+  //   await workbook.xlsx.readFile(exportPath);
+  //   //const workbookReader = new Excel.stream.xlsx.WorkbookReader(exportPath);
+  //   let jsonData = [];
+  //   workbook.worksheets.forEach(function(sheet) {
+  //       // read first row as data keys
+  //       let firstRow = sheet.getRow(16);
+  //       let d = 2;
+  //       // while(firstRow.values){
+  //       //   firstRow = sheet.getRow(d)
+  //       //   d++;
+  //       //   console.log(firstRow.values)
+  //       //   console.log(d)
+  //       // }
+  //        console.log(firstRow.cellCount)
+  //        console.log(firstRow.values)
+  //       if (!firstRow.cellCount) return;
+  //       let keys = firstRow.values;
+  //       sheet.eachRow((row, rowNumber) => {
+  //           if (rowNumber == 1) return;
+  //           let values = row.values
+  //           //console.log(rowNumber,values)
+  //           let obj = {};
+  //           for (let i = 1; i < keys.length; i ++) {
+  //             //console.log(i,values[i])
+  //               if(values[i] != undefined)
+  //                 obj[keys[i]] = values[i];
+  //           }
+  //           //console.log(obj)
+  //           if(obj?.['undefined'] !=0 && (typeof obj?.['Tổng khách hàng trong năm']) == typeof 1){
+  //             //console.log(obj?.['Tổng khách hàng trong năm'])
+  //             jsonData.push(obj);
+  //           }
+  //       })
 
-    });
-    console.log(jsonData);
-   // console.log(workbookReader)
-    return jsonData // worksheet
-  }
+  //   });
+  //   console.log(jsonData);
+  //  // console.log(workbookReader)
+  //   return jsonData // worksheet
+  // }
  
 }

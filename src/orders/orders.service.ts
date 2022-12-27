@@ -38,7 +38,7 @@ import { UpdateDoneOrderDto } from './dto/update-done-order.dto';
 import { UpdateCancelOrderDto } from './dto/update-cancel-order.dto';
 import { RequestConfirmationOrderDto } from './dto/request-confirmation-order.dto';
 import { deleteFile, signedUrl, uploadFile } from 'src/commons/utils/s3Client';
-import { fs } from 'file-system';
+//import { fs } from 'file-system';
 import { StaticFile } from 'src/commons/utils/staticFile';
 
 @Injectable()
@@ -1544,7 +1544,7 @@ export class OrdersService {
 
     const url = `order/checkoutphoto/${id}/${file.filename}`
   
-    var img = fs.readFileSync(url);
+   // var img = fs.readFileSync(url);
     if (resume.checkoutPhoto) {
       deleteFile(resume.checkoutPhoto);
     }

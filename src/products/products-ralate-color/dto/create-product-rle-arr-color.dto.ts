@@ -14,7 +14,6 @@ export class CreateRelateColorDto {
   * @example 6130532100ca5f0097ead758
   */
     @IsMongoId()
-    @IsOptional()
     color: string;
 
     @IsNumber()
