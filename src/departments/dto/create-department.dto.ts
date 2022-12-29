@@ -1,21 +1,27 @@
-import { IsString, IsMongoId, IsOptional } from "class-validator";
+import { IsString, IsMongoId, IsOptional, IsNumber, ValidateNested} from "class-validator";
+import { Type } from 'class-transformer';
+import { CreateRelateColorDto } from "src/products/products-ralate-color/dto/create-product-rle-arr-color.dto";
 
 export class CreateDepartmentDto {
-    @IsString()
-    name: string;
-
     @IsString()
     @IsOptional()
     description?: string;
 
-    @IsString()
-    address: string;
-
     @IsMongoId()
     @IsOptional()
-    locations: string;
+    supplier: string;
 
+    @ValidateNested({ each: true })
+    @Type(() => CreateProductDetailtDto)
+    products: CreateProductDetailtDto[];
+}
+
+export class CreateProductDetailtDto {
     @IsMongoId()
     @IsOptional()
-    userId: string;
+    product: string;
+
+    @ValidateNested({ each: true })
+    @Type(() => CreateRelateColorDto)
+    colors: CreateRelateColorDto[];
 }

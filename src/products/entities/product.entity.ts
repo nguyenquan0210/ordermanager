@@ -6,7 +6,7 @@ import { ITenant } from 'src/commons/mongoosePlugins/tenant';
 import { Types } from 'mongoose';
 import { ProductAttributeDocument, ProductAttributeSchema } from "./product-attribute.entity";
 import { ProductCategory } from 'src/product-categories/entities/product-category.entity';
-import { PRODUCT_CTG, PRODUCT_LABEL, PRODUCT_RELATE_CUSTOMER, PRODUCT_RELATE_TODO, PRODUCT_STATUS } from 'src/commons/constants/schemaConst';
+import { PRODUCT_COLOR, PRODUCT_CTG, PRODUCT_LABEL, PRODUCT_RELATE_COLOR, PRODUCT_RELATE_CUSTOMER, PRODUCT_RELATE_TODO, PRODUCT_STATUS } from 'src/commons/constants/schemaConst';
 import { ProductStatus } from 'src/product-status/entities/product-status.entity';
 import { TenantPlugin } from 'src/commons/mongoosePlugins/tenant.plugin';
 import { Label } from 'src/labels/entities/label.entity';
@@ -15,6 +15,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Todo } from 'src/todos/entities/todo.entity';
 import { CommissionFeeTypeEnum } from 'src/commons/enum/products/commissionFeeTypeEnum';
 import { PriceType } from 'src/commons/enum/products/priceTypeEnum';
+import { ProductRelateColors } from './products-ralate-color.entity';
 
 @Schema({ timestamps: true, toJSON: { versionKey: false } })
 export class Product implements ITenant {
@@ -128,6 +129,9 @@ export class Product implements ITenant {
     
     /** Virtual field */
     relateTodos?: { todo: Todo }[];
+
+    /** Virtual field */
+    relateColors?: { color: ProductRelateColors }[];
 }
 
 export type ProductDocument = Product & Document;
@@ -150,3 +154,11 @@ plugins.virtual('relateTodos', {
     localField: '_id',
     foreignField: 'product'
 });
+
+plugins.virtual('relateColors', {
+    ref: PRODUCT_RELATE_COLOR,
+    justOne: false,
+    localField: '_id',
+    foreignField: 'product'
+});
+

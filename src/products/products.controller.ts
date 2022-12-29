@@ -424,21 +424,21 @@ export class ProductsController {
   // //#endregion
   
   //#region relate Departments
-  @Post(':id/relate-colors')
-  async addRelateDepartments(@Param('id') id: string,
-  @Body() createRelateArrColorDto: CreateRelateArrColorDto,
-    @AuthUser() authUser: JwtUser) {
-    const result = await this.productsService.addRelateColors(id, createRelateArrColorDto, authUser);
-    return new OkRespone({ data: result });
-  }
+  // @Post(':id/relate-colors')
+  // async addRelateDepartments(@Param('id') id: string,
+  // @Body() createRelateArrColorDto: CreateRelateArrColorDto,
+  //   @AuthUser() authUser: JwtUser) {
+  //   const result = await this.productsService.addRelateColors(id, createRelateArrColorDto, authUser);
+  //   return new OkRespone({ data: result });
+  // }
 
-  @Put(':id/relate-colors')
-  async updateRelateDepartments(@Param('id') id: string,
-    @Body() createRelateArrColorDto: CreateRelateArrColorDto,
-    @AuthUser() authUser: JwtUser) {
-    const result = await this.productsService.updateRelateColors(id, createRelateArrColorDto, authUser);
-    return new OkRespone({ data: result });
-  }
+  // @Put(':id/relate-colors')
+  // async updateRelateDepartments(@Param('id') id: string,
+  //   @Body() createRelateArrColorDto: CreateRelateArrColorDto,
+  //   @AuthUser() authUser: JwtUser) {
+  //   const result = await this.productsService.updateRelateColors(id, createRelateArrColorDto, authUser);
+  //   return new OkRespone({ data: result });
+  // }
 
   // @Delete(':id/relate-colors')
   // async removeRelateDepartments(@Param('id') id: string,

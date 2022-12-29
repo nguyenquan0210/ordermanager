@@ -130,8 +130,11 @@ export class RelateColorService {
     //#endregion
 
     //#region Color Relate Product
-    async addRelateColor(doc: ProductDocument, createRelateArrProductDto: CreateRelateArrColorDto , authUser: JwtUser) {
+    async addRelateColor(doc: ProductDocument, createRelateArrProductDto: CreateRelateArrColorDto, isOrder: Boolean , authUser: JwtUser) {
         let result = [];
+        // console.log(createRelateArrProductDto)
+        // return
+        let totalMoney = 0;
         if (createRelateArrProductDto.colors) {
             
             for (const key in createRelateArrProductDto.colors) {
@@ -139,7 +142,7 @@ export class RelateColorService {
                 dto.product = doc._id;
                 dto.color = createRelateArrProductDto.colors[key].color;
                 const exists = await this.model.findOne(dto).lean().exec();
-                
+                totalMoney += createRelateArrProductDto.colors[key].money;
                 if (!exists) {
                     dto.quantity = createRelateArrProductDto.colors[key].quantity;
                     dto.money = createRelateArrProductDto.colors[key].money;
@@ -147,20 +150,24 @@ export class RelateColorService {
                     result.push(relateColor);
                     relateColor.save()
                 } else {
-                    
-                    exists.quantity += createRelateArrProductDto.colors[key].quantity;
+                    if(isOrder){
+                        exists.quantity -= createRelateArrProductDto.colors[key].quantity;
+                    }else{
+                        exists.quantity += createRelateArrProductDto.colors[key].quantity;
+                    }
+                    exists.money = createRelateArrProductDto.colors[key].money;
                     await this.model.findByIdAndUpdate(exists._id, exists).exec()
                     result.push(exists);
                 }
             }
         }
-        return result;
+        return { result, totalMoney } ;
     }
 
     async updateRelateColor(doc: ProductDocument, createRelateArrProductDto: CreateRelateArrColorDto, authUser: JwtUser) {
         if (createRelateArrProductDto) {
             //var result = this.model.deleteMany({ Color: { $in: doc.id } })
-              await  this.addRelateColor(doc, createRelateArrProductDto, authUser);
+              await  this.addRelateColor(doc, createRelateArrProductDto, true, authUser);
         }
     }
 

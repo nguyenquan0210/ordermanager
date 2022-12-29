@@ -9,6 +9,8 @@ export const PRODUCT_RELATE_TODO = 'product_relate_todo';
 export const PRODUCT_RELATE_DEPARTMENT = 'product_relate_department';
 export const PRODUCT_RELATE_COLOR = 'product_relate_color';
 
+export const DEPARTMENT_DETAILT = 'department_detailt';
+
 export const CUSTOMER_LABEL = 'customer_label';
 export const CUSTOMER_DEMAND_GROUP = 'customer_demand_group';
 export const CUSTOMER_RELATE_TODO = 'customer_relate_todo';

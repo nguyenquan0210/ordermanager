@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException, ForbiddenException} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import _, { map } from 'lodash';
 import { FilterQuery, Model } from 'mongoose';
@@ -87,21 +87,21 @@ export class ProductsService {
 
     CheckRoleStaff(userReq, StaffRole.Product)
 
-    if(createProductDto.productCode){
+    if (createProductDto.productCode) {
       const productCode = await this.isProductCodeExist(createProductDto.productCode, userReq);
       if (productCode) {
         throw new BadRequestException(ErrCode.E_PRODUCT_CODE_EXISTED);
       }
     }
 
-    if(createProductDto.priceSale && createProductDto.price < createProductDto.priceSale){
+    if (createProductDto.priceSale && createProductDto.price < createProductDto.priceSale) {
       throw new BadRequestException('Price must be greater than PriceSale');
     }
 
-    if(createProductDto.quantity <= 0){
+    if (createProductDto.quantity <= 0) {
       throw new BadRequestException('Quantity must be greater than 0');
     }
-    
+
     const product = await new this.productModel(createProductDto)
       .withTenant(userReq.owner)
       .save();
@@ -122,7 +122,7 @@ export class ProductsService {
     return false;
   }
 
-  async checkProductCode(userReq: JwtUser, productCode: string ) {
+  async checkProductCode(userReq: JwtUser, productCode: string) {
     const check = await this.isProductCodeExist(productCode, userReq);
     if (check) {
       throw new BadRequestException(ErrCode.E_PRODUCT_CODE_EXISTED);
@@ -147,6 +147,10 @@ export class ProductsService {
       .populate({
         path: 'relateTodos',
         populate: { path: 'todo', select: 'name description startDate dueDate priority status' }
+      })
+      .populate({
+        path: 'relateColors',
+        populate: { path: 'color', select: 'name color description' }
       })
       .lean({ autopopulate: true })
 
@@ -210,6 +214,10 @@ export class ProductsService {
         path: 'relateTodos',
         populate: { path: 'todo', select: 'name description startDate dueDate priority status' }
       })
+      .populate({
+        path: 'relateColors',
+        populate: { path: 'color', select: 'name color description' }
+      })
       .lean({ autopopulate: true })
 
     // if (query.isOwner) {
@@ -257,7 +265,7 @@ export class ProductsService {
 
   findOne(id: string, userReq: JwtUser) {
     return this.productModel.findById(id)
-      .byTenant(userReq.owner)
+      .byTenant(userReq.owner, false)
       .populate({
         path: 'relateCustomers', select: '-_id',
         populate: { path: 'customer', select: 'fullName email phone avatar' }
@@ -366,30 +374,30 @@ export class ProductsService {
       .byTenant(userReq.owner)
       .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
       .exec();
-    
-    if( updateProductDto.price && updateProductDto.priceSale ) {
-      if( updateProductDto.price < updateProductDto.priceSale ) {
+
+    if (updateProductDto.price && updateProductDto.priceSale) {
+      if (updateProductDto.price < updateProductDto.priceSale) {
         throw new BadRequestException('Price must be greater than PriceSale');
       }
     }
-    if( !updateProductDto.price && updateProductDto.priceSale ) {
-      if( doc.price < updateProductDto.priceSale ) {
+    if (!updateProductDto.price && updateProductDto.priceSale) {
+      if (doc.price < updateProductDto.priceSale) {
         throw new BadRequestException('Price must be greater than PriceSale');
       }
     }
-    if( updateProductDto.price && !updateProductDto.priceSale ) {
-      if( updateProductDto.price < doc.priceSale ) {
+    if (updateProductDto.price && !updateProductDto.priceSale) {
+      if (updateProductDto.price < doc.priceSale) {
         throw new BadRequestException('Price must be greater than PriceSale');
       }
     }
 
-    if(updateProductDto.productCode && updateProductDto.productCode != doc.productCode ){
+    if (updateProductDto.productCode && updateProductDto.productCode != doc.productCode) {
       const productCode = await this.isProductCodeExist(updateProductDto.productCode, userReq);
       if (productCode) {
         throw new BadRequestException(ErrCode.E_PRODUCT_CODE_EXISTED);
       }
     }
-      
+
     const history = {
       product: doc._id,
       before: doc.toJSON(),
@@ -414,14 +422,14 @@ export class ProductsService {
 
   async remove(id: string, userReq: JwtUser) {
     // CheckRoleStaff(userReq, StaffRole.Product)
-    if(userReq.role == UserRole.Staff){
+    if (userReq.role == UserRole.Staff) {
       throw new ForbiddenException();
     }
     const cmd = await this.modelOrderProduct.findOne({ product: id })
       .byTenant(userReq.owner)
       .where('isDone', false)
       .exec();
-    if(cmd){
+    if (cmd) {
       throw new ForbiddenException(ErrCode.E_PRODUCT_IN_ORDER_NOT_DONE);
     }
     const doc = await this.productModel.findByIdAndDelete(id)
@@ -448,7 +456,7 @@ export class ProductsService {
   }
 
   async uploadImage(id: string, file: Express.Multer.File, userReq: JwtUser, filename?: string, description?: string) {
-    
+
     const product = await this.productModel.findById(id)
       .byTenant(userReq.owner)
       .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
@@ -459,7 +467,7 @@ export class ProductsService {
       updatedBy: userReq.userId,
       status: StatusHistory.create
     }
-   
+
     const url = `products/${userReq.owner}/${id}/${ResourceType.Image}/${file.filename}`;
 
     product.imageList.push({
@@ -479,7 +487,7 @@ export class ProductsService {
   }
 
   async uploadVideo(id: string, file: Express.Multer.File, userReq: JwtUser, filename?: string) {
-    
+
     const product = await this.productModel.findById(id)
       .byTenant(userReq.owner)
       .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
@@ -512,7 +520,7 @@ export class ProductsService {
   }
 
   async uploadFile(id: string, file: Express.Multer.File, userReq: JwtUser, filename?: string) {
-    
+
     const product = await this.productModel.findById(id)
       .byTenant(userReq.owner)
       .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
@@ -544,8 +552,8 @@ export class ProductsService {
     return result;
   }
 
-  async uploads(id: string, file: Express.Multer.File, userReq: JwtUser, filename?: string) {   
-    
+  async uploads(id: string, file: Express.Multer.File, userReq: JwtUser, filename?: string) {
+
     const product = await this.productModel.findById(id)
       .byTenant(userReq.owner)
       .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
@@ -1004,66 +1012,66 @@ export class ProductsService {
   // }
   // //#endregion
 
-    //#region add Relate Departments
-  async addRelateColors(productId: string, createRelateArrColorDto: CreateRelateArrColorDto, authUser: JwtUser) {
-    const doc = await this.productModel.findById(productId)
-      .byTenant(authUser.owner, authUser?.role == UserRole.Admin)
-      .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
-      .exec();
+  //#region add Relate Departments
+  // async addRelateColors(productId: string, createRelateArrColorDto: CreateRelateArrColorDto, authUser: JwtUser) {
+  //   const doc = await this.productModel.findById(productId)
+  //     .byTenant(authUser.owner, true)
+  //     .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
+  //     .exec();
 
-    const history = {
-      product: doc._id,
-      before: doc.toJSON(),
-      updatedBy: authUser.userId,
-      status: StatusHistory.addRelate
-    };
+  //   const history = {
+  //     product: doc._id,
+  //     before: doc.toJSON(),
+  //     updatedBy: authUser.userId,
+  //     status: StatusHistory.addRelate
+  //   };
 
-    const result = this.relateColorService.addRelateColor(doc, createRelateArrColorDto, authUser);
-    const change = _.omit(difference(createRelateArrColorDto.colors, history.before), ['updatedAt']);
-    this.historyService.create({ ...history, change }, authUser);
+  //   const result = this.relateColorService.addRelateColor(doc, createRelateArrColorDto, false, authUser);
+  //   const change = _.omit(difference(createRelateArrColorDto.colors, history.before), ['updatedAt']);
+  //   this.historyService.create({ ...history, change }, authUser);
 
-    return result;
-  }
+  //   return result;
+  // }
 
-  async updateRelateColors(productId: string, createRelateArrColorDto: CreateRelateArrColorDto, authUser: JwtUser) {
-    const doc = await this.productModel.findById(productId)
-      .byTenant(authUser.owner, authUser?.role == UserRole.Admin)
-      .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
-      .exec();
+  // async updateRelateColors(productId: string, createRelateArrColorDto: CreateRelateArrColorDto, authUser: JwtUser) {
+  //   const doc = await this.productModel.findById(productId)
+  //     .byTenant(authUser.owner, authUser?.role == UserRole.Admin)
+  //     .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
+  //     .exec();
 
-    const history = {
-      product: doc._id,
-      before: doc.toJSON(),
-      updatedBy: authUser.userId,
-      status: StatusHistory.addRelate
-    };
+  //   const history = {
+  //     product: doc._id,
+  //     before: doc.toJSON(),
+  //     updatedBy: authUser.userId,
+  //     status: StatusHistory.addRelate
+  //   };
 
-    const result = this.relateColorService.updateRelateColor(doc, createRelateArrColorDto, authUser);
-    const change = _.omit(difference(createRelateArrColorDto.colors, history.before), ['updatedAt']);
-    this.historyService.create({ ...history, change }, authUser);
+  //   const result = this.relateColorService.updateRelateColor(doc, createRelateArrColorDto, authUser);
+  //   const change = _.omit(difference(createRelateArrColorDto.colors, history.before), ['updatedAt']);
+  //   this.historyService.create({ ...history, change }, authUser);
 
-    return result;
-  }
+  //   return result;
+  // }
 
-  async removeRelateColors(productId: string, departmentIds: string[], authUser: JwtUser) {
-    const doc = await this.productModel.findById(productId)
-      .byTenant(authUser.owner, authUser?.role == UserRole.Admin)
-      .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
-      .exec();
+  // async removeRelateColors(productId: string, departmentIds: string[], authUser: JwtUser) {
+  //   const doc = await this.productModel.findById(productId)
+  //     .byTenant(authUser.owner, authUser?.role == UserRole.Admin)
+  //     .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
+  //     .exec();
 
-    const history = {
-      product: doc._id,
-      before: doc.toJSON(),
-      updatedBy: authUser.userId,
-      status: StatusHistory.removeRelate
-    };
+  //   const history = {
+  //     product: doc._id,
+  //     before: doc.toJSON(),
+  //     updatedBy: authUser.userId,
+  //     status: StatusHistory.removeRelate
+  //   };
 
-    const result = await this.relateColorService.removeRelateColorMultiple(doc, departmentIds);
-    const change = _.omit(difference(doc.toJSON(), history.before), ['updatedAt']);
-    this.historyService.create({ ...history, change }, authUser);
+  //   const result = await this.relateColorService.removeRelateColorMultiple(doc, departmentIds);
+  //   const change = _.omit(difference(doc.toJSON(), history.before), ['updatedAt']);
+  //   this.historyService.create({ ...history, change }, authUser);
 
-    return result;
-  }
+  //   return result;
+  // }
   //#endregion
 
   //#region add Relate Owners
