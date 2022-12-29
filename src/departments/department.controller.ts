@@ -35,8 +35,9 @@ export class DepartmentsController {
 
     @Post()
     async create(@Body() createDepartmentDto: CreateDepartmentDto, @AuthUser() authUser: JwtUser) {
+        //console.log(createDepartmentDto)
         const res = await this.departmentService.createDepartment(createDepartmentDto, authUser);
-        return new OkRespone({ data: { _id: res._id } });
+        return new OkRespone({ data: res });
     }
 
     @Get()
@@ -58,6 +59,13 @@ export class DepartmentsController {
             search, limit, offset
         });
     }
+
+    @Get('demo')
+    @AllowPublic()
+    demos() {
+      return this.departmentService.demo();
+    }
+  
 
     @Get('currency')
     @ApiQuery({ name: 'currency', required: false, enum: Currency })
