@@ -1,5 +1,7 @@
 export const PRODUCT_STATUS = 'product_status';
 export const PRODUCT_CTG = 'product_category';
+export const PRODUCT_TYPES = 'product_types';
+export const PRODUCT_VERSIONS = 'product_version';
 
 export const PRODUCT_COLOR = 'product_color';
 export const PRODUCT_LABEL = 'product_label';

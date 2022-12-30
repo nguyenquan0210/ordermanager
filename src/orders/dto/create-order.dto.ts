@@ -39,11 +39,11 @@ export class CreateOrderDto {
     @Type(() => OrderProductDto)
     products: OrderProductDto[];
    
-    // @IsDateString()
-    // startDate?: Date;
+    @IsDateString()
+    startDate?: Date;
 
-    // @IsDateString()
-    // dueDate?: Date;
+    @IsDateString()
+    dueDate?: Date;
 
     @IsString()
     @IsOptional()

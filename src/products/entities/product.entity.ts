@@ -6,8 +6,7 @@ import { ITenant } from 'src/commons/mongoosePlugins/tenant';
 import { Types } from 'mongoose';
 import { ProductAttributeDocument, ProductAttributeSchema } from "./product-attribute.entity";
 import { ProductCategory } from 'src/product-categories/entities/product-category.entity';
-import { PRODUCT_COLOR, PRODUCT_CTG, PRODUCT_LABEL, PRODUCT_RELATE_COLOR, PRODUCT_RELATE_CUSTOMER, PRODUCT_RELATE_TODO, PRODUCT_STATUS } from 'src/commons/constants/schemaConst';
-import { ProductStatus } from 'src/product-status/entities/product-status.entity';
+import { PRODUCT_COLOR, PRODUCT_CTG, PRODUCT_LABEL, PRODUCT_RELATE_COLOR, PRODUCT_RELATE_CUSTOMER, PRODUCT_RELATE_TODO, PRODUCT_STATUS, PRODUCT_TYPES, PRODUCT_VERSIONS } from 'src/commons/constants/schemaConst';
 import { TenantPlugin } from 'src/commons/mongoosePlugins/tenant.plugin';
 import { Label } from 'src/labels/entities/label.entity';
 import { Customer } from 'src/customers/entities/customer.entity';
@@ -16,6 +15,9 @@ import { Todo } from 'src/todos/entities/todo.entity';
 import { CommissionFeeTypeEnum } from 'src/commons/enum/products/commissionFeeTypeEnum';
 import { PriceType } from 'src/commons/enum/products/priceTypeEnum';
 import { ProductRelateColors } from './products-ralate-color.entity';
+import { ProductTypes } from 'src/product-types/entities/product-types.entity';
+import { ProductVerstions } from 'src/product-versions/entities/product-versions.entity';
+import { ProductStatusEnum } from '../interface/product-status';
 
 @Schema({ timestamps: true, toJSON: { versionKey: false } })
 export class Product implements ITenant {
@@ -46,10 +48,25 @@ export class Product implements ITenant {
     category?: string | ProductCategory;
 
     @Prop({
-        type: mongoose.Schema.Types.ObjectId, ref: PRODUCT_STATUS,
-        autopopulate: { select: 'name color description' }
+        type: mongoose.Schema.Types.ObjectId, ref: PRODUCT_TYPES,
+        autopopulate: { select: 'name description' }
     })
-    status?: string | ProductStatus;
+    type?: string | ProductTypes;
+
+    @Prop({
+        type: mongoose.Schema.Types.ObjectId, ref: PRODUCT_VERSIONS,
+        autopopulate: { select: 'name description' }
+    })
+    version?: string | ProductVerstions;
+
+    // @Prop({
+    //     type: mongoose.Schema.Types.ObjectId, ref: PRODUCT_STATUS,
+    //     autopopulate: { select: 'name color description' }
+    // })
+    // status?: string | ProductStatus;
+
+    @Prop({ default: ProductStatusEnum.Activate }) 
+    status?: ProductStatusEnum;
 
     @Prop([{
         type: mongoose.Schema.Types.ObjectId, ref: PRODUCT_LABEL,

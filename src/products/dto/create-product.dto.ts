@@ -1,8 +1,9 @@
-import { IsArray, IsBoolean, IsMongoId, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsArray, IsBoolean, IsMongoId, IsNumber, IsOptional, IsString, IsEnum } from "class-validator";
 import { defaults } from "lodash";
 import { CommissionFeeTypeEnum } from "src/commons/enum/products/commissionFeeTypeEnum";
 import { PriceType } from "src/commons/enum/products/priceTypeEnum";
 import { ProductAttribute } from "../entities/product-attribute.entity";
+import { ProductStatusEnum } from "../interface/product-status";
 
 export class CreateProductDto {
     /**
@@ -26,12 +27,30 @@ export class CreateProductDto {
     @IsMongoId()
     @IsOptional()
     category: string;
+
     /**
-     * Product status id
+     * Product category id
      * @example 6118e9fcb952b9001ce3a9ea
      */
     @IsMongoId()
-    status: string;
+    @IsOptional()
+    type: string;
+
+    /**
+    * Product category id
+    * @example 6118e9fcb952b9001ce3a9ea
+    */
+    @IsMongoId()
+    @IsOptional()
+    version: string;
+
+    /**
+     * Default is `status`
+     * @example [Activate, Inactive, AlmostOver, Over]
+     */
+    @IsEnum(ProductStatusEnum)
+    @IsOptional()
+    status: ProductStatusEnum;
 
     /**
      * Array of label's id
@@ -74,7 +93,7 @@ export class CreateProductDto {
     // @IsString()
     // @IsOptional()
     // malo?: string
-    
+
     // @IsString()
     // @IsOptional()
     // address?: string
@@ -107,7 +126,7 @@ export class CreateProductDto {
      * Array of todo's id
      * @example ["6118e9fcb952b9001ce3a9eb"]
      */
-    
+
     @IsArray()
     @IsMongoId({ each: true })
     @IsOptional()
@@ -118,7 +137,7 @@ export class CreateProductDto {
     @IsOptional()
     carerStaffs: string[];
 
-    
+
     @IsString()
     @IsOptional()
     productCode?: string

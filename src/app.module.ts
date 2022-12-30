@@ -24,6 +24,9 @@ import { FeedbacksModule } from './feedback/feedback.module';
 import { CommissionModule } from './commissions/commission.module';
 import { DepartmentsModule } from './departments/department.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
+import { ProductTypesModule } from './product-types/product-types.module';
+import { ProductVerstions } from './product-versions/entities/product-versions.entity';
+import { ProductVerstionsModule } from './product-versions/product-versions.module';
 
 @Module({
   imports: [
@@ -35,7 +38,9 @@ import { SuppliersModule } from './suppliers/suppliers.module';
     DepartmentsModule,
     FeedbacksModule,
     ProductCategoriesModule,
-    ProductStatusModule,
+    ProductTypesModule,
+    ProductVerstionsModule,
+    //ProductStatusModule,
     ProductsModule,
     CustomerModule,
     LoggerModule,
