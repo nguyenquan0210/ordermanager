@@ -6,7 +6,7 @@ import { Product, ProductSchema } from './entities/product.entity';
 import { AttributesModule } from 'src/attributes/attributes.module';
 import { ProductCategorySchema } from 'src/product-categories/entities/product-category.entity';
 import {
-  PRODUCT_CTG, PRODUCT_STATUS, PRODUCT_LABEL, PRODUCT_HISTORY, PRODUCT_RELATE_CUSTOMER, PRODUCT_RELATE_TODO, PRODUCT_RELATE_DEPARTMENT, PRODUCT_COLOR, PRODUCT_RELATE_COLOR
+  PRODUCT_CTG, PRODUCT_STATUS, PRODUCT_LABEL, PRODUCT_HISTORY, PRODUCT_RELATE_CUSTOMER, PRODUCT_RELATE_TODO, PRODUCT_RELATE_DEPARTMENT, PRODUCT_COLOR, PRODUCT_RELATE_COLOR, PRODUCT_TYPES, PRODUCT_VERSIONS
 } from 'src/commons/constants/schemaConst';
 import { ProductStatusSchema } from 'src/product-status/entities/product-status.entity';
 import { LabelSchema } from 'src/labels/entities/label.entity';
@@ -36,6 +36,8 @@ import { ProductColorsService } from './products-color/products-color.service';
 import { ColorsController } from './products-color.controller';
 import { RelateColorService } from './products-ralate-color/relate-color.service';
 import { ProductRelateColorsSchema } from './entities/products-ralate-color.entity';
+import { ProductTypesSchema } from 'src/product-types/entities/product-types.entity';
+import { ProductVerstionsSchema } from 'src/product-versions/entities/product-versions.entity';
 
 @Module({
   imports: [
@@ -44,6 +46,8 @@ import { ProductRelateColorsSchema } from './entities/products-ralate-color.enti
       { name: Customer.name, useFactory: () => CustomerSchema },
       { name: User.name, useFactory: () =>  UserSchema },
       { name: PRODUCT_CTG, useFactory: () => ProductCategorySchema },
+      { name: PRODUCT_TYPES, useFactory: () => ProductTypesSchema },
+      { name: PRODUCT_VERSIONS, useFactory: () => ProductVerstionsSchema },
       { name: PRODUCT_STATUS, useFactory: () => ProductStatusSchema },
       { name: PRODUCT_LABEL, useFactory: () => LabelSchema },
       { name: PRODUCT_COLOR, useFactory: () => LabelSchema },
