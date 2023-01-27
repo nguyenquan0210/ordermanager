@@ -150,7 +150,7 @@ export class ProductsService {
       })
       .populate({
         path: 'relateColors',
-        populate: { path: 'color', select: 'name color description' }
+        populate: { path: 'color', select: 'name color money departmentMoney description' }
       })
       .lean({ autopopulate: true })
 
@@ -216,7 +216,7 @@ export class ProductsService {
       })
       .populate({
         path: 'relateColors',
-        populate: { path: 'color', select: 'name color description' }
+        populate: { path: 'color', select: 'name color money departmentMoney description' }
       })
       .lean({ autopopulate: true })
 

@@ -40,6 +40,7 @@ import { RequestConfirmationOrderDto } from './dto/request-confirmation-order.dt
 import { deleteFile, signedUrl, uploadFile } from 'src/commons/utils/s3Client';
 //import { fs } from 'file-system';
 import { StaticFile } from 'src/commons/utils/staticFile';
+import { RelateColorService } from 'src/products/products-ralate-color/relate-color.service';
 
 @Injectable()
 export class OrdersService {
@@ -51,6 +52,7 @@ export class OrdersService {
     @InjectModel(Customer.name) private customerModel: Model<CustomerDocument>,
     @InjectModel(ORDER_COMMENT) private modelOrderComment: Model<OrderCommentDocument>,
     @InjectModel(USER_KPI) private modelUserKPI: Model<UserKPIDocument>,
+    private readonly relateColorService: RelateColorService,
     private readonly historyService: HistoriesService,
     private readonly orderStatusService: OrderStatusService,
     private readonly orderLabelService: OrderLabelService,
@@ -93,21 +95,22 @@ export class OrdersService {
       .withTenant(userReq.owner);
       order.createdBy = userReq.userId;
       let totalProductMoney = 0;
+      const products = CreateOrderDto.products?.filter(x => x.product)
       for (let index = 0; index < CreateOrderDto.products?.length; index++) {
         if( CreateOrderDto.products[index].quantity <= 0){
           throw new BadRequestException("quantity must be greater than 0");
         }
-        const validObjectId = Types.ObjectId.isValid(CreateOrderDto.products[index].product);
-        if (!validObjectId) {
-            throw new BadRequestException('product must be a mongodb id');
-        }
-        const orderProduct = await this.productModel.findById(CreateOrderDto.products[index].product)
-          .byTenant(userReq.owner, userReq.role == UserRole.Customer? true: false)
-          .populateTenant('name')
-          .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
-          .exec();
-
-        if(CreateOrderDto.products[index].quantity > orderProduct.quantity){
+        // const validObjectId = Types.ObjectId.isValid(CreateOrderDto.products[index].product);
+        // if (!validObjectId) {
+        //     throw new BadRequestException('product must be a mongodb id');
+        // }
+        // const orderProduct = await this.productModel.findById(CreateOrderDto.products[index].product)
+        //   .byTenant(userReq.owner, userReq.role == UserRole.Customer? true: false)
+        //   .populateTenant('name')
+        //   .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
+        //   .exec();
+        const checkQty = await this.relateColorService.checkQtyColor(CreateOrderDto.products[index].color,CreateOrderDto.products[index].product, CreateOrderDto.products[index].quantity, false);
+        if(!checkQty){
           throw new BadRequestException('product is not enough');
         }
       }
@@ -118,26 +121,24 @@ export class OrdersService {
           .populateTenant('name')
           .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
           .exec();
-
+        const orderColor = await this.relateColorService.findOne(CreateOrderDto.products[index].color,CreateOrderDto.products[index].product);
         const oProduct = {
           ...CreateOrderDto.products[index],
           order : order._id,
           nameProduct : orderProduct.name,
           imgProduct : orderProduct.imageList[0]?.url ? orderProduct.imageList[0].url : "",
-          price : orderProduct.price,
-          priceSale : orderProduct.priceSale,
+          price : orderColor?.departmentMoney,
+          priceSale : orderColor?.money,
           unit: orderProduct.unit||""
         }
         this.orderProductService.create(oProduct, userReq);
 
-        if(orderProduct.priceSale > 0){
-          const Money = orderProduct.priceSale * CreateOrderDto.products[index].quantity;
+      
+          const Money = orderColor.money * CreateOrderDto.products[index].quantity;
           totalProductMoney = totalProductMoney + Money;
-        } else {
-          const Money = orderProduct.price * CreateOrderDto.products[index].quantity;
-          totalProductMoney = totalProductMoney + Money;
-        }
-        orderProduct.set({quantity: (orderProduct.quantity - CreateOrderDto.products[index].quantity)}).save()
+       
+        //orderProduct.set({quantity: (orderProduct.quantity - CreateOrderDto.products[index].quantity)}).save()
+        this.relateColorService.checkQtyColor(CreateOrderDto.products[index].color,CreateOrderDto.products[index].product, CreateOrderDto.products[index].quantity, true);
       }
       order.totalProductMoney = totalProductMoney;
 
@@ -686,8 +687,7 @@ export class OrdersService {
         }
 
         const oProduct = {
-          product: updateOrderDto.products[index].product,
-          quantity: updateOrderDto.products[index].quantity,
+         ... updateOrderDto.products[index],
           order : id,
           nameProduct : product.name,
           imgProduct : product.imageList[0]?.url ? product.imageList[0].url : "",

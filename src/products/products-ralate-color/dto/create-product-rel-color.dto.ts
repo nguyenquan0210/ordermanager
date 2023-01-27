@@ -20,6 +20,9 @@ export class CreateProductRelateColorDto {
   @IsNumber()
   money: number;
 
+  @IsNumber()
+  departmentMoney: number;
+
   @IsString()
   @IsOptional()
   note?: string;

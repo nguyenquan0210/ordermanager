@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { NotFoundException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtUser } from 'src/auth/inteface/jwtUser';
@@ -26,6 +26,28 @@ export class RelateColorService {
         }
         return new this.model(dto)
             .save()
+    }
+
+    async checkQtyColor(idColor: string, idProduct: string, qty: number, isOrder: boolean) {
+        const color = await this.model.findOne({ color: idColor, product: idProduct })
+            .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
+            .exec();
+            console.log(color)
+        if(isOrder){
+            color.quantity -= qty;
+            await this.model.findByIdAndUpdate(color.id, color).exec();
+            return color
+        }else{
+            if(color.quantity >= qty) return true;
+            return true
+        }
+    }
+
+    async findOne(idColor: string, idProduct: string) {
+        const color = await this.model.findOne({ color: idColor, product: idProduct })
+            .orFail(new NotFoundException(ErrCode.E_PRODUCT_NOT_FOUND))
+            .exec();
+        return color
     }
 
     async delete(ids: string[]) {
@@ -142,10 +164,12 @@ export class RelateColorService {
                 dto.product = doc._id;
                 dto.color = createRelateArrProductDto.colors[key].color;
                 const exists = await this.model.findOne(dto).lean().exec();
+                const money  =  createRelateArrProductDto.colors[key].money + ((createRelateArrProductDto.colors[key].money * 30)/100);
                 totalMoney += createRelateArrProductDto.colors[key].money;
                 if (!exists) {
                     dto.quantity = createRelateArrProductDto.colors[key].quantity;
-                    dto.money = createRelateArrProductDto.colors[key].money;
+                    dto.money = money ;
+                    dto.departmentMoney = createRelateArrProductDto.colors[key].money ;
                     const relateColor = await new this.model(dto)
                     result.push(relateColor);
                     relateColor.save()
@@ -155,7 +179,8 @@ export class RelateColorService {
                     }else{
                         exists.quantity += createRelateArrProductDto.colors[key].quantity;
                     }
-                    exists.money = createRelateArrProductDto.colors[key].money;
+                    dto.departmentMoney = createRelateArrProductDto.colors[key].money ;
+                    exists.money = money;
                     await this.model.findByIdAndUpdate(exists._id, exists).exec()
                     result.push(exists);
                 }

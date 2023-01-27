@@ -121,7 +121,7 @@ export class DepartmentsService {
 
         const cmd = this.model.find({ ...filter })
             .populate({
-                path: 'departmentDetailt', select: '-_id',
+                path: 'departmentDetailt',
                 populate: { path: 'detailt', select: 'quantity money unit' }
             })
             .lean({ autopopulate: true })
@@ -149,15 +149,15 @@ export class DepartmentsService {
     }
 
     async findOne(id: string, userReq: JwtUser) {
-        var result = this.model.findById(id).populate({
-            path: 'departmentDetailt', select: '-_id',
+        return this.model.findById(id)
+        .byTenant(userReq.owner, true)
+        .populate({
+            path: 'departmentDetailt', 
             populate: { path: 'detailt', select: 'quantity money unit' }
         })
-            .lean({ autopopulate: true });
-        if (userReq.role != UserRole.Admin) {
-            result.byTenant(userReq.owner);
-        }
-        return result.orFail(new NotFoundException(ErrCode.E_Department_NOT_FOUND)).exec();
+        .lean({ autopopulate: true })
+        .orFail(new NotFoundException(ErrCode.E_Department_NOT_FOUND))
+        .exec();
     }
 
     async getDepartment(idOwner: string, check?: Boolean) {
