@@ -34,7 +34,7 @@ export class CreateOrderDto {
     @IsMongoId()
     customers: string;
 
-    // @IsArray()
+    @IsArray()
     @ValidateNested({ each: true })
     @Type(() => OrderProductDto)
     products: OrderProductDto[];
@@ -61,9 +61,18 @@ export class CreateOrderDto {
 }
 
 export class OrderProductDto {
-    @IsString()
+    /**
+    * Product id
+    * @example 6118e9fcb952b9001ce3a9ea
+    */
+    @IsMongoId()
     product: string;
-
+    /**
+    * Color id
+    * @example 6118e9fcb952b9001ce3a9ea
+    */
+    @IsMongoId()
+    color: string;
     /**
      * @example 1
      */

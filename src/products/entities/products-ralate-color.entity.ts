@@ -25,6 +25,9 @@ export class ProductRelateColors {
 
   @Prop() 
   money: number;
+
+  @Prop() 
+  departmentMoney: number;
   
   @Prop() 
   note?: string;

@@ -10,6 +10,9 @@ export class OrderProduct {
 
     @Prop()
     product: string;
+
+    @Prop()
+    color: string;
     
     @Prop()
     nameProduct?: string;

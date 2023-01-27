@@ -5,7 +5,7 @@ import { OrdersService } from './orders.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Order, OrderSchema } from './entities/order.entity';
 import { OrderStatusSchema } from 'src/order-status/entities/order-status.entity';
-import { ORDER_STATUS, ORDER_LABEL, ORDER_HISTORY, ORDER_COMMENT, ORDER_PRODUCT, USER_KPI } from 'src/commons/constants/schemaConst';
+import { ORDER_STATUS, ORDER_LABEL, ORDER_HISTORY, ORDER_COMMENT, ORDER_PRODUCT, USER_KPI, PRODUCT_RELATE_COLOR } from 'src/commons/constants/schemaConst';
 import { LabelSchema } from 'src/labels/entities/label.entity';
 import { LabelsController } from './order-labels.controller';
 import { OrderLabelService } from './order-label/order-label.service';
@@ -28,6 +28,8 @@ import { UserKPISchema } from 'src/users/entities/user-kpi.entity';
 import { CustomerModule } from 'src/customers/customer.module';
 import { Customer, CustomerSchema } from 'src/customers/entities/customer.entity';
 import { Commission, CommissionSchema } from 'src/commissions/entities/commission.entity';
+import { RelateColorService } from 'src/products/products-ralate-color/relate-color.service';
+import { ProductRelateColorsSchema } from 'src/products/entities/products-ralate-color.entity';
 
 @Module({
   imports: [
@@ -49,6 +51,7 @@ import { Commission, CommissionSchema } from 'src/commissions/entities/commissio
           return OrderHistorySchema.plugin(TenantPlugin.addPlugin);
         }
       },
+      { name: PRODUCT_RELATE_COLOR, useFactory: () => ProductRelateColorsSchema},
     ]),
     NotificationsModule,
   ],
@@ -65,6 +68,7 @@ import { Commission, CommissionSchema } from 'src/commissions/entities/commissio
     OrdersService,
     OrderStatusService,
     OrderLabelService,
+    RelateColorService,
     HistoriesService
   ]
 })
